@@ -1,0 +1,42 @@
+{
+  "id": "FEAT-009",
+  "type": "feat",
+  "description": "Wave 1 - M06 Output and Alarm: Implement actuation service for warning lights, sirens, and stop request commands via Modbus DO. Branch: feat/m06-output-alarm. This is R3 safety-critical.",
+  "status": "pending",
+  "steps": [
+    "Create branch feat/m06-output-alarm from main",
+    "Create services/gateway-server/internal/domain/actuation/types.go with CommandType (WARNING_LIGHT, SIREN, STOP_REQUEST_PULSE, AUDIO_ANNOUNCEMENT), CommandResult, ActuationCommand struct with commandId, correlationId, timeout",
+    "Create services/gateway-server/internal/domain/actuation/service.go implementing ActuationService: ExecuteCommand, CheckFeedback, GetPendingCommands",
+    "Create services/gateway-server/internal/domain/actuation/service_test.go testing: command execution, timeout handling, duplicate prevention, feedback verification",
+    "Create services/gateway-server/internal/domain/actuation/dedup.go preventing duplicate output commands for same event within suppression window",
+    "Create services/gateway-server/internal/domain/actuation/dedup_test.go",
+    "Create services/gateway-server/internal/domain/actuation/replay_guard.go ensuring no past commands are replayed after restart",
+    "Create services/gateway-server/internal/domain/actuation/replay_guard_test.go testing that boot does not replay old pulse commands",
+    "Create services/gateway-server/internal/adapters/io/output/output.go implementing DO command execution via IOAdapter",
+    "Create services/gateway-server/internal/adapters/io/output/output_test.go",
+    "Ensure stop requests go to PLC/Safety Relay only (never direct machine power)",
+    "Ensure command has ID, correlation ID, timeout, and result tracking",
+    "Ensure retry is limited (no infinite retry on missing ACK)",
+    "Ensure restart does not replay past pulse commands",
+    "Document R3 classification and safety constraints in code",
+    "Run make build and make test",
+    "Commit all changes"
+  ],
+  "acceptance_criteria": [
+    "ActuationService executes warning light, siren, and stop request commands",
+    "Each command has unique ID, correlation ID, timeout, and tracked result",
+    "Duplicate output suppression prevents same event from triggering multiple pulses",
+    "Restart does not replay past commands (replay guard test passes)",
+    "Retry is bounded (not infinite)",
+    "No direct machine power switching logic (output goes to PLC/Safety Relay input)",
+    "make build succeeds",
+    "make test succeeds"
+  ],
+  "verification": [
+    "make build succeeds",
+    "make test succeeds",
+    "make verify-fast succeeds"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

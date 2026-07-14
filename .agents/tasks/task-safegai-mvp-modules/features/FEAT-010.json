@@ -1,0 +1,39 @@
+{
+  "id": "FEAT-010",
+  "type": "feat",
+  "description": "Wave 1 - M08 Media Gateway: Implement MediaMTX configuration and stream proxy management for up to 4 camera streams. Branch: feat/m08-media-gateway",
+  "status": "pending",
+  "steps": [
+    "Create branch feat/m08-media-gateway from main",
+    "Create services/gateway-server/internal/adapters/media/interface.go defining MediaProxy interface: AddStream, RemoveStream, GetStreamStatus, Health",
+    "Create services/gateway-server/internal/adapters/media/types.go with StreamConfig, StreamStatus, MediaHealth structs",
+    "Create services/gateway-server/internal/adapters/media/config.go with MediaMTX configuration generation (RTSP source pull, WebRTC/HLS output, codec passthrough, no transcoding, no recording)",
+    "Create services/gateway-server/internal/adapters/media/config_test.go testing config generation for 1-4 cameras",
+    "Create services/gateway-server/internal/adapters/media/manager.go implementing stream lifecycle management with on-demand connection",
+    "Create services/gateway-server/internal/adapters/media/manager_test.go testing: add/remove stream, health check, reconnection logic",
+    "Create services/gateway-server/internal/adapters/media/simulator/simulator.go mock MediaProxy for testing without MediaMTX",
+    "Create infra/edge/mediamtx/mediamtx.example.yml with production-like MediaMTX config template (4 stream paths, WebRTC enabled, no recording)",
+    "Ensure no transcoding or recording logic exists",
+    "Ensure camera credentials are referenced from encrypted local config only (no hardcoded credentials)",
+    "Ensure streams reconnect independently (one camera failure does not affect others)",
+    "Document performance budget: 4 streams within 1GB memory target",
+    "Run make build and make test",
+    "Commit all changes"
+  ],
+  "acceptance_criteria": [
+    "MediaProxy interface supports up to 4 simultaneous streams",
+    "Configuration generates valid MediaMTX compatible config",
+    "No transcoding or recording logic present",
+    "No hardcoded camera credentials",
+    "Streams are independent (one failure does not block others)",
+    "make build succeeds",
+    "make test succeeds"
+  ],
+  "verification": [
+    "make build succeeds",
+    "make test succeeds",
+    "make verify-fast succeeds"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

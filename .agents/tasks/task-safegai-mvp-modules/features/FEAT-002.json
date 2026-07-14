@@ -1,0 +1,45 @@
+{
+  "id": "FEAT-002",
+  "type": "feat",
+  "description": "Wave 0 - M00 Foundation: Create shared contracts (JSON Schema), event envelope, error model, common Go packages, and project scaffolding. Branch: feat/m00-foundation",
+  "status": "pending",
+  "steps": [
+    "Create branch feat/m00-foundation from main",
+    "Create contracts/events/event-envelope-v1.schema.json with common fields: schemaVersion, eventId, correlationId, tenantId, siteId, gatewayId, deviceId, zoneId, observedAt, receivedAt, sequenceNo, source, quality",
+    "Create contracts/events/camera-event-v1.schema.json for camera occupancy events",
+    "Create contracts/events/occupancy-state-v1.schema.json with states: OCCUPIED, VACANT_PENDING, VACANT_CONFIRMED, UNKNOWN, STALE",
+    "Create contracts/events/equipment-state-v1.schema.json for equipment RUNNING/STOPPED/RESTART_REQUESTED/UNKNOWN",
+    "Create contracts/events/safety-decision-v1.schema.json for safety rule outcomes",
+    "Create contracts/events/actuation-result-v1.schema.json for output command results",
+    "Create contracts/events/cloud-event-v1.schema.json for cloud sync events",
+    "Create contracts/api/local-api-v1.schema.json with basic endpoint definitions",
+    "Create contracts/errors/error-model-v1.schema.json with standard error response format",
+    "Create services/gateway-server/go.mod with module github.com/thingswell-hjlee/safegai-iot-automation/services/gateway-server using Go 1.25 (available version)",
+    "Create services/gateway-server/cmd/safegai-edge/main.go with minimal skeleton (config load, logger, graceful shutdown, health endpoint)",
+    "Create services/gateway-server/internal/domain/events/envelope.go with EventEnvelope struct matching schema",
+    "Create services/gateway-server/internal/domain/events/types.go with OccupancyState, EquipmentState, SafetyDecision enums/constants",
+    "Create services/gateway-server/internal/domain/errors/errors.go with standard error types",
+    "Create services/gateway-server/internal/domain/events/envelope_test.go with validation tests",
+    "Create services/gateway-server/internal/domain/events/types_test.go with state validation tests",
+    "Update Makefile if needed to ensure Go build and test work with the new structure",
+    "Run make build to confirm compilation",
+    "Run make test to confirm unit tests pass",
+    "Run make verify-fast to confirm full fast verification passes",
+    "Commit all changes with descriptive message"
+  ],
+  "acceptance_criteria": [
+    "All JSON Schema files in contracts/events/ pass make check-json validation",
+    "Go module compiles with make build producing dist/safegai-edge binary",
+    "Go unit tests pass with make test",
+    "EventEnvelope struct has all required fields from schema",
+    "OccupancyState constants match exactly: OCCUPIED, VACANT_PENDING, VACANT_CONFIRMED, UNKNOWN, STALE",
+    "make verify-fast passes"
+  ],
+  "verification": [
+    "make build succeeds",
+    "make test succeeds",
+    "make verify-fast succeeds"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}
