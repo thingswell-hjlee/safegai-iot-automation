@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://safegai.thingswell.co.kr/contracts/events/cloud-event-v1.schema.json",
+  "title": "CloudSyncEvent",
+  "description": "Event envelope for gateway-to-cloud synchronization via the async outbox.",
+  "type": "object",
+  "allOf": [
+    { "$ref": "event-envelope-v1.schema.json" }
+  ],
+  "properties": {
+    "syncType": {
+      "type": "string",
+      "enum": ["STATUS_UPDATE", "EVENT_METADATA", "REPRESENTATIVE_IMAGE", "ALERT_NOTIFICATION", "BACKUP", "VERSION_CHECK"],
+      "description": "Type of cloud synchronization payload"
+    },
+    "syncState": {
+      "type": "string",
+      "enum": ["PENDING", "IN_PROGRESS", "COMPLETED", "FAILED", "RETRYING"],
+      "description": "Current state of the sync operation"
+    },
+    "retryCount": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Number of retry attempts"
+    },
+    "payload": {
+      "type": "object",
+      "description": "Sync payload content (varies by syncType)"
+    },
+    "enqueuedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the event was placed in the outbox"
+    },
+    "lastAttemptAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp of last sync attempt"
+    }
+  },
+  "required": ["syncType", "syncState", "retryCount", "enqueuedAt"]
+}

@@ -1,0 +1,23 @@
+# Build artifacts
+dist/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+
+# Go
+*.exe
+*.test
+*.out
+
+# Task agent state
+.agents/

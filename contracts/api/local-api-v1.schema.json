@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://safegai.thingswell.co.kr/contracts/api/local-api-v1.schema.json",
+  "title": "LocalAPI",
+  "description": "Local gateway HTTP API endpoint definitions for the hybrid app and maintenance tools.",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "type": "string",
+      "const": "v1",
+      "description": "API version"
+    },
+    "basePath": {
+      "type": "string",
+      "const": "/api/v1",
+      "description": "Base path for all API endpoints"
+    },
+    "endpoints": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Endpoint"
+      }
+    }
+  },
+  "required": ["apiVersion", "basePath", "endpoints"],
+  "$defs": {
+    "Endpoint": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Endpoint path relative to basePath"
+        },
+        "method": {
+          "type": "string",
+          "enum": ["GET", "POST", "PUT", "DELETE", "PATCH"],
+          "description": "HTTP method"
+        },
+        "description": {
+          "type": "string",
+          "description": "Endpoint purpose"
+        },
+        "requiresAuth": {
+          "type": "boolean",
+          "description": "Whether authentication is required"
+        },
+        "requiredMode": {
+          "type": "string",
+          "enum": ["user", "operator", "maintainer"],
+          "description": "Minimum user mode required to access this endpoint"
+        }
+      },
+      "required": ["path", "method", "description", "requiresAuth", "requiredMode"]
+    },
+    "HealthResponse": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["healthy", "degraded", "unhealthy"]
+        },
+        "version": {
+          "type": "string"
+        },
+        "uptime": {
+          "type": "string"
+        },
+        "checks": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "enum": ["ok", "warn", "fail"]
+          }
+        }
+      },
+      "required": ["status", "version"]
+    }
+  }
+}

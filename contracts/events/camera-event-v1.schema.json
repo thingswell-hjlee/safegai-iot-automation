@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://safegai.thingswell.co.kr/contracts/events/camera-event-v1.schema.json",
+  "title": "CameraEvent",
+  "description": "Normalized camera occupancy event emitted by camera adapters.",
+  "type": "object",
+  "allOf": [
+    { "$ref": "event-envelope-v1.schema.json" }
+  ],
+  "properties": {
+    "eventType": {
+      "type": "string",
+      "enum": ["OCCUPANCY_CHANGE", "PERSON_ENTER", "PERSON_EXIT", "DWELL_ALERT", "CAMERA_HEALTH"],
+      "description": "Type of camera event"
+    },
+    "occupancyCount": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Number of persons detected in the zone"
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "description": "AI detection confidence score"
+    },
+    "imageRef": {
+      "type": "string",
+      "description": "Reference to the event snapshot image (local path or URL)"
+    },
+    "cameraModel": {
+      "type": "string",
+      "description": "Camera manufacturer and model identifier"
+    },
+    "rawVendorPayload": {
+      "type": "object",
+      "description": "Original vendor-specific payload preserved for debugging"
+    }
+  },
+  "required": [
+    "eventType",
+    "occupancyCount",
+    "confidence"
+  ]
+}
