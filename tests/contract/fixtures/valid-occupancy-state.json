@@ -1,0 +1,9 @@
+{
+  "zone_id": "zone-a",
+  "state": "OCCUPIED",
+  "previous_state": "VACANT_CONFIRMED",
+  "confidence": 0.92,
+  "source_camera_ids": ["cam-zone-a-01", "cam-zone-a-02"],
+  "timestamp": "2024-01-01T12:00:05.000Z",
+  "dwell_seconds": 0
+}

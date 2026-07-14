@@ -1,0 +1,103 @@
+{
+  "title": "ScenarioTestSchema",
+  "description": "Defines the format for SafeGAI scenario test files.",
+  "type": "object",
+  "required": ["name", "description", "preconditions", "steps", "expected_outputs"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Unique scenario identifier."
+    },
+    "description": {
+      "type": "string",
+      "description": "What safety behavior is being validated."
+    },
+    "preconditions": {
+      "type": "object",
+      "description": "Initial state before scenario begins.",
+      "properties": {
+        "zones": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["zone_id", "occupancy_state"],
+            "properties": {
+              "zone_id": { "type": "string" },
+              "occupancy_state": { "type": "string" },
+              "equipment_state": { "type": "string" }
+            }
+          }
+        },
+        "cameras": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["camera_id", "status"],
+            "properties": {
+              "camera_id": { "type": "string" },
+              "status": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["timestamp", "event_type", "payload"],
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "event_type": {
+            "type": "string",
+            "enum": ["camera_event", "occupancy_state", "equipment_state", "safety_decision", "actuation_result"]
+          },
+          "payload": {
+            "type": "object"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "expected_states": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "zone_id": { "type": "string" },
+          "occupancy_state": { "type": "string" },
+          "equipment_state": { "type": "string" }
+        }
+      },
+      "description": "Expected zone states after all steps execute."
+    },
+    "expected_outputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "decision"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["safety_decision", "actuation_command", "alarm", "suppressed"]
+          },
+          "decision": {
+            "type": "string"
+          },
+          "zone_id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Expected safety decisions or outputs from the scenario."
+    }
+  }
+}

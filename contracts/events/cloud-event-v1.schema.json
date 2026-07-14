@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://safegai.thingswell.io/contracts/events/cloud-event-v1.schema.json",
+  "title": "CloudEvent",
+  "description": "Event envelope for cloud sync via outbox pattern.",
+  "type": "object",
+  "required": ["id", "source", "type", "time", "data"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique event identifier."
+    },
+    "source": {
+      "type": "string",
+      "description": "Gateway or edge device identifier."
+    },
+    "type": {
+      "type": "string",
+      "description": "Event type for cloud routing."
+    },
+    "time": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp."
+    },
+    "specversion": {
+      "type": "string",
+      "const": "1.0",
+      "description": "CloudEvents specification version."
+    },
+    "datacontenttype": {
+      "type": "string",
+      "const": "application/json",
+      "description": "Content type of the data field."
+    },
+    "data": {
+      "type": "object",
+      "description": "Event payload data."
+    },
+    "synced": {
+      "type": "boolean",
+      "description": "Whether the event has been synced to cloud."
+    },
+    "retry_count": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Number of sync retry attempts."
+    }
+  },
+  "additionalProperties": false
+}

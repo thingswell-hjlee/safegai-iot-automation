@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://safegai.thingswell.io/contracts/errors/error-model-v1.schema.json",
+  "title": "ErrorModel",
+  "description": "Standard error response model for all SafeGAI components.",
+  "type": "object",
+  "required": ["error_code", "message", "timestamp"],
+  "properties": {
+    "error_code": {
+      "type": "string",
+      "pattern": "^[A-Z]+_[A-Z0-9_]+$",
+      "description": "Machine-readable error code."
+    },
+    "message": {
+      "type": "string",
+      "description": "Human-readable error message."
+    },
+    "details": {
+      "type": "object",
+      "description": "Additional error context."
+    },
+    "source": {
+      "type": "string",
+      "description": "Module or component that generated the error."
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["CRITICAL", "ERROR", "WARNING", "INFO"],
+      "description": "Error severity level."
+    },
+    "recoverable": {
+      "type": "boolean",
+      "description": "Whether the error condition is automatically recoverable."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of error occurrence."
+    },
+    "correlation_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Correlation ID for tracing."
+    }
+  },
+  "additionalProperties": false
+}
