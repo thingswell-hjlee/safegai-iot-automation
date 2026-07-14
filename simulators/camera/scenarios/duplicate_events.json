@@ -1,0 +1,35 @@
+{
+  "name": "duplicate_events",
+  "description": "Rapid duplicate events from the same camera, zone, and event type within the 2-second dedup window. The first event should pass through, subsequent duplicates within the window should be suppressed.",
+  "cameraId": "cam-sim-001",
+  "events": [
+    {
+      "zoneId": "zone-A",
+      "eventType": "person_detected",
+      "personCount": 1,
+      "confidence": 0.95,
+      "timestampOffsetMs": 0
+    },
+    {
+      "zoneId": "zone-A",
+      "eventType": "person_detected",
+      "personCount": 1,
+      "confidence": 0.95,
+      "timestampOffsetMs": 100
+    },
+    {
+      "zoneId": "zone-A",
+      "eventType": "person_detected",
+      "personCount": 1,
+      "confidence": 0.95,
+      "timestampOffsetMs": 200
+    },
+    {
+      "zoneId": "zone-A",
+      "eventType": "person_detected",
+      "personCount": 1,
+      "confidence": 0.95,
+      "timestampOffsetMs": 3000
+    }
+  ]
+}
