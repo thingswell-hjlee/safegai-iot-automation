@@ -15,6 +15,7 @@ const (
 	CodeIOFailure   ErrorCode = "IO_FAILURE"
 	CodeConnection  ErrorCode = "CONNECTION_ERROR"
 	CodeModbusError ErrorCode = "MODBUS_ERROR"
+	CodeCapacityLimit ErrorCode = "CAPACITY_LIMIT"
 )
 
 // DomainError is the base interface for all domain errors.
@@ -185,4 +186,23 @@ func NewConnectionError(host string, port int, message string, cause error) *Con
 // NewModbusError creates a new ModbusError.
 func NewModbusError(functionCode, exceptionCode byte, message string) *ModbusError {
 	return &ModbusError{FunctionCode: functionCode, ExceptionCode: exceptionCode, Message: message}
+}
+
+// CapacityLimitError indicates a resource limit has been reached.
+type CapacityLimitError struct {
+	Resource string
+	Limit    int
+	Message  string
+}
+
+func (e *CapacityLimitError) Error() string {
+	return fmt.Sprintf("capacity limit on %s (max %d): %s", e.Resource, e.Limit, e.Message)
+}
+
+func (e *CapacityLimitError) Code() ErrorCode { return CodeCapacityLimit }
+func (e *CapacityLimitError) Retryable() bool { return false }
+
+// NewCapacityLimitError creates a new CapacityLimitError.
+func NewCapacityLimitError(resource string, limit int, message string) *CapacityLimitError {
+	return &CapacityLimitError{Resource: resource, Limit: limit, Message: message}
 }
