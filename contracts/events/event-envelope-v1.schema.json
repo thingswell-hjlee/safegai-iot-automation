@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://safegai.thingswell.co.kr/contracts/events/event-envelope-v1.schema.json",
+  "title": "EventEnvelope",
+  "description": "Common envelope wrapping all SafeGAI domain events. Every event must include these fields.",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "description": "Semantic version of the envelope schema",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "examples": ["1.0.0"]
+    },
+    "eventId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Globally unique event identifier (UUIDv4)"
+    },
+    "correlationId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Correlation ID linking related events in a causal chain"
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Tenant identifier for multi-tenant isolation"
+    },
+    "siteId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Physical site or factory identifier"
+    },
+    "gatewayId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Gateway instance identifier"
+    },
+    "deviceId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Source device identifier (camera, I/O module, etc.)"
+    },
+    "zoneId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Logical zone identifier within the site"
+    },
+    "observedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when the event was observed at source"
+    },
+    "receivedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when the gateway received the event"
+    },
+    "sequenceNo": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Monotonically increasing sequence number per source"
+    },
+    "source": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Logical source component name (e.g. camera-adapter, zone-engine)"
+    },
+    "quality": {
+      "type": "string",
+      "enum": ["GOOD", "UNCERTAIN", "BAD", "STALE"],
+      "description": "Data quality indicator for the event payload"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "eventId",
+    "correlationId",
+    "tenantId",
+    "siteId",
+    "gatewayId",
+    "deviceId",
+    "zoneId",
+    "observedAt",
+    "receivedAt",
+    "sequenceNo",
+    "source",
+    "quality"
+  ],
+  "additionalProperties": true
+}

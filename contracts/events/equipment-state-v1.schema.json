@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://safegai.thingswell.co.kr/contracts/events/equipment-state-v1.schema.json",
+  "title": "EquipmentStateEvent",
+  "description": "Equipment running state change event from I/O or PLC source.",
+  "type": "object",
+  "allOf": [
+    { "$ref": "event-envelope-v1.schema.json" }
+  ],
+  "properties": {
+    "previousState": {
+      "$ref": "#/$defs/EquipmentState",
+      "description": "Previous equipment state"
+    },
+    "currentState": {
+      "$ref": "#/$defs/EquipmentState",
+      "description": "Current equipment state"
+    },
+    "equipmentId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Equipment or machine identifier"
+    },
+    "transitionReason": {
+      "type": "string",
+      "description": "Reason for the state change"
+    },
+    "requestedBy": {
+      "type": "string",
+      "description": "Identifier of the entity that requested the state change"
+    }
+  },
+  "required": ["previousState", "currentState", "equipmentId", "transitionReason"],
+  "$defs": {
+    "EquipmentState": {
+      "type": "string",
+      "enum": ["RUNNING", "STOPPED", "RESTART_REQUESTED", "UNKNOWN"],
+      "description": "Equipment operational states"
+    }
+  }
+}
