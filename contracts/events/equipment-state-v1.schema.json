@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://safegai.thingswell.io/contracts/events/equipment-state-v1.schema.json",
+  "title": "EquipmentState",
+  "description": "Equipment operational state change event.",
+  "type": "object",
+  "required": ["equipment_id", "zone_id", "state", "timestamp"],
+  "properties": {
+    "equipment_id": {
+      "type": "string",
+      "description": "Unique identifier of the equipment."
+    },
+    "zone_id": {
+      "type": "string",
+      "description": "Zone where the equipment is located."
+    },
+    "state": {
+      "type": "string",
+      "enum": ["RUNNING", "STOPPED", "STOPPING", "STARTING", "FAULT", "OFFLINE"],
+      "description": "Current operational state of the equipment."
+    },
+    "previous_state": {
+      "type": "string",
+      "enum": ["RUNNING", "STOPPED", "STOPPING", "STARTING", "FAULT", "OFFLINE"],
+      "description": "Previous operational state."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of state change."
+    },
+    "source": {
+      "type": "string",
+      "enum": ["PLC", "SAFETY_RELAY", "MANUAL", "SYSTEM"],
+      "description": "Source of the state report."
+    }
+  },
+  "additionalProperties": false
+}

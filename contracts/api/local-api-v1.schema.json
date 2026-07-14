@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://safegai.thingswell.io/contracts/api/local-api-v1.schema.json",
+  "title": "LocalAPI",
+  "description": "Local REST API schema for edge gateway. Used by Hybrid App to query state.",
+  "type": "object",
+  "required": ["endpoints"],
+  "properties": {
+    "endpoints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["method", "path", "description", "response"],
+        "properties": {
+          "method": {
+            "type": "string",
+            "enum": ["GET", "POST", "PUT", "DELETE", "PATCH"]
+          },
+          "path": {
+            "type": "string",
+            "pattern": "^/api/v1/"
+          },
+          "description": {
+            "type": "string"
+          },
+          "request_body": {
+            "type": "object"
+          },
+          "response": {
+            "type": "object",
+            "required": ["status", "body"],
+            "properties": {
+              "status": { "type": "integer" },
+              "body": { "type": "object" }
+            }
+          },
+          "auth_required": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

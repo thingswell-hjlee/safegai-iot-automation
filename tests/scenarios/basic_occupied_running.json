@@ -1,0 +1,57 @@
+{
+  "name": "basic_occupied_running",
+  "description": "Zone OCCUPIED with equipment RUNNING must produce STOP_REQUEST_REQUIRED decision.",
+  "preconditions": {
+    "zones": [
+      {
+        "zone_id": "zone-a",
+        "occupancy_state": "VACANT_CONFIRMED",
+        "equipment_state": "RUNNING"
+      }
+    ],
+    "cameras": [
+      { "camera_id": "cam-zone-a-01", "status": "ONLINE" }
+    ]
+  },
+  "steps": [
+    {
+      "timestamp": "2024-01-01T12:00:00.000Z",
+      "event_type": "camera_event",
+      "payload": {
+        "camera_id": "cam-zone-a-01",
+        "zone_id": "zone-a",
+        "event_type": "PERSON_DETECTED",
+        "confidence": 0.95,
+        "timestamp": "2024-01-01T12:00:00.000Z"
+      },
+      "description": "Person detected in zone-a by camera"
+    },
+    {
+      "timestamp": "2024-01-01T12:00:01.000Z",
+      "event_type": "occupancy_state",
+      "payload": {
+        "zone_id": "zone-a",
+        "state": "OCCUPIED",
+        "confidence": 0.95,
+        "source_camera_ids": ["cam-zone-a-01"],
+        "timestamp": "2024-01-01T12:00:01.000Z"
+      },
+      "description": "Zone transitions to OCCUPIED"
+    }
+  ],
+  "expected_states": [
+    {
+      "zone_id": "zone-a",
+      "occupancy_state": "OCCUPIED",
+      "equipment_state": "RUNNING"
+    }
+  ],
+  "expected_outputs": [
+    {
+      "type": "safety_decision",
+      "decision": "STOP_REQUEST_REQUIRED",
+      "zone_id": "zone-a",
+      "reason": "Zone occupied while equipment is running"
+    }
+  ]
+}

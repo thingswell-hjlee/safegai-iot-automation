@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://safegai.thingswell.io/contracts/events/event-envelope-v1.schema.json",
+  "title": "EventEnvelope",
+  "description": "Common envelope wrapping all SafeGAI domain events.",
+  "type": "object",
+  "required": ["event_id", "event_type", "source", "timestamp", "version", "payload"],
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique identifier for this event instance."
+    },
+    "event_type": {
+      "type": "string",
+      "description": "Fully qualified event type name."
+    },
+    "source": {
+      "type": "string",
+      "description": "Origin module or component that produced the event."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when the event was created."
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic version of the event schema."
+    },
+    "correlation_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Optional correlation ID for tracing related events."
+    },
+    "payload": {
+      "type": "object",
+      "description": "Event-specific data payload."
+    }
+  },
+  "additionalProperties": false
+}

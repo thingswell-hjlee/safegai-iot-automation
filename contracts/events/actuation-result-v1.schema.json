@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://safegai.thingswell.io/contracts/events/actuation-result-v1.schema.json",
+  "title": "ActuationResult",
+  "description": "Result of an actuation command sent to PLC or Safety Relay.",
+  "type": "object",
+  "required": ["actuation_id", "equipment_id", "command", "result", "timestamp"],
+  "properties": {
+    "actuation_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique identifier for this actuation attempt."
+    },
+    "decision_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Reference to the safety decision that triggered this actuation."
+    },
+    "equipment_id": {
+      "type": "string",
+      "description": "Equipment that was actuated."
+    },
+    "command": {
+      "type": "string",
+      "enum": ["STOP_REQUEST", "ALLOW_START", "EMERGENCY_STOP"],
+      "description": "Command sent to PLC/Safety Relay. Only stop requests are sent; no direct power cutoff."
+    },
+    "result": {
+      "type": "string",
+      "enum": ["SUCCESS", "FAILED", "TIMEOUT", "REJECTED"],
+      "description": "Outcome of the actuation attempt."
+    },
+    "target": {
+      "type": "string",
+      "enum": ["PLC", "SAFETY_RELAY"],
+      "description": "Target device that received the command."
+    },
+    "latency_ms": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Round-trip latency in milliseconds."
+    },
+    "error_message": {
+      "type": "string",
+      "description": "Error details if result is FAILED or TIMEOUT."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of actuation."
+    }
+  },
+  "additionalProperties": false
+}

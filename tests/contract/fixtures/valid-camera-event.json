@@ -1,0 +1,11 @@
+{
+  "camera_id": "cam-zone-a-01",
+  "zone_id": "zone-a",
+  "event_type": "PERSON_DETECTED",
+  "confidence": 0.95,
+  "bounding_boxes": [
+    { "x": 120.5, "y": 80.0, "width": 60.0, "height": 180.0 }
+  ],
+  "frame_id": "frame-20240101-120000-001",
+  "timestamp": "2024-01-01T12:00:00.000Z"
+}

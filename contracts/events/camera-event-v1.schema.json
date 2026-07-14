@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://safegai.thingswell.io/contracts/events/camera-event-v1.schema.json",
+  "title": "CameraEvent",
+  "description": "Normalized camera detection event from camera adapter.",
+  "type": "object",
+  "required": ["camera_id", "zone_id", "event_type", "timestamp"],
+  "properties": {
+    "camera_id": {
+      "type": "string",
+      "description": "Unique identifier of the camera."
+    },
+    "zone_id": {
+      "type": "string",
+      "description": "Zone monitored by this camera."
+    },
+    "event_type": {
+      "type": "string",
+      "enum": ["PERSON_DETECTED", "PERSON_LEFT", "MOTION_DETECTED", "NO_MOTION", "CAMERA_OFFLINE", "CAMERA_ONLINE"],
+      "description": "Type of camera detection event."
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "description": "Detection confidence score."
+    },
+    "bounding_boxes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "x": { "type": "number" },
+          "y": { "type": "number" },
+          "width": { "type": "number" },
+          "height": { "type": "number" }
+        },
+        "required": ["x", "y", "width", "height"]
+      },
+      "description": "Detected object bounding boxes."
+    },
+    "frame_id": {
+      "type": "string",
+      "description": "Reference to the video frame."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of detection."
+    }
+  },
+  "additionalProperties": false
+}
