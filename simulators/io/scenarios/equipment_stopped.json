@@ -1,0 +1,19 @@
+{
+  "name": "equipment_stopped",
+  "description": "Equipment is stopped. DI[0] (run signal from PLC) is inactive.",
+  "module": "8DI/8DO Isolated Modbus",
+  "protocol": "Modbus TCP",
+  "digitalInputs": [
+    { "address": 0, "value": false, "signal": "equipment_running", "source": "PLC" },
+    { "address": 1, "value": false, "signal": "restart_requested", "source": "operator_panel" },
+    { "address": 2, "value": false, "signal": "output_feedback",   "source": "PLC/Safety Relay" },
+    { "address": 3, "value": false, "signal": "reserved",          "source": "-" },
+    { "address": 4, "value": false, "signal": "reserved",          "source": "-" },
+    { "address": 5, "value": false, "signal": "reserved",          "source": "-" },
+    { "address": 6, "value": false, "signal": "reserved",          "source": "-" },
+    { "address": 7, "value": false, "signal": "reserved",          "source": "-" }
+  ],
+  "expectedEquipmentState": "STOPPED",
+  "expectedQuality": "GOOD",
+  "safetyNote": "Normal stopped state confirmed by PLC. No abnormal condition."
+}

@@ -7,11 +7,14 @@ import "fmt"
 type ErrorCode string
 
 const (
-	CodeValidation ErrorCode = "VALIDATION_ERROR"
-	CodeNotFound   ErrorCode = "NOT_FOUND"
-	CodeConflict   ErrorCode = "CONFLICT"
-	CodeInternal   ErrorCode = "INTERNAL_ERROR"
-	CodeTimeout    ErrorCode = "TIMEOUT"
+	CodeValidation  ErrorCode = "VALIDATION_ERROR"
+	CodeNotFound    ErrorCode = "NOT_FOUND"
+	CodeConflict    ErrorCode = "CONFLICT"
+	CodeInternal    ErrorCode = "INTERNAL_ERROR"
+	CodeTimeout     ErrorCode = "TIMEOUT"
+	CodeIOFailure   ErrorCode = "IO_FAILURE"
+	CodeConnection  ErrorCode = "CONNECTION_ERROR"
+	CodeModbusError ErrorCode = "MODBUS_ERROR"
 )
 
 // DomainError is the base interface for all domain errors.
@@ -92,6 +95,58 @@ func (e *TimeoutError) Error() string {
 func (e *TimeoutError) Code() ErrorCode { return CodeTimeout }
 func (e *TimeoutError) Retryable() bool { return true }
 
+// IOFailureError indicates an I/O adapter failure.
+// I/O failure must never be treated as normal or safe state.
+type IOFailureError struct {
+	Adapter   string
+	Operation string
+	Cause     error
+}
+
+func (e *IOFailureError) Error() string {
+	if e.Cause != nil {
+		return fmt.Sprintf("I/O failure [%s] %s: %v", e.Adapter, e.Operation, e.Cause)
+	}
+	return fmt.Sprintf("I/O failure [%s] %s", e.Adapter, e.Operation)
+}
+
+func (e *IOFailureError) Code() ErrorCode { return CodeIOFailure }
+func (e *IOFailureError) Retryable() bool { return true }
+func (e *IOFailureError) Unwrap() error   { return e.Cause }
+
+// ConnectionError indicates a communication link failure.
+type ConnectionError struct {
+	Host    string
+	Port    int
+	Message string
+	Cause   error
+}
+
+func (e *ConnectionError) Error() string {
+	if e.Cause != nil {
+		return fmt.Sprintf("connection error %s:%d: %s: %v", e.Host, e.Port, e.Message, e.Cause)
+	}
+	return fmt.Sprintf("connection error %s:%d: %s", e.Host, e.Port, e.Message)
+}
+
+func (e *ConnectionError) Code() ErrorCode { return CodeConnection }
+func (e *ConnectionError) Retryable() bool { return true }
+func (e *ConnectionError) Unwrap() error   { return e.Cause }
+
+// ModbusError indicates a Modbus protocol-level error.
+type ModbusError struct {
+	FunctionCode  byte
+	ExceptionCode byte
+	Message       string
+}
+
+func (e *ModbusError) Error() string {
+	return fmt.Sprintf("modbus error FC=0x%02X EC=0x%02X: %s", e.FunctionCode, e.ExceptionCode, e.Message)
+}
+
+func (e *ModbusError) Code() ErrorCode { return CodeModbusError }
+func (e *ModbusError) Retryable() bool { return e.ExceptionCode == 0x06 } // Server busy
+
 // NewValidationError creates a new ValidationError.
 func NewValidationError(field, message string) *ValidationError {
 	return &ValidationError{Field: field, Message: message}
@@ -115,4 +170,19 @@ func NewInternalError(message string, cause error) *InternalError {
 // NewTimeoutError creates a new TimeoutError.
 func NewTimeoutError(operation string) *TimeoutError {
 	return &TimeoutError{Operation: operation}
+}
+
+// NewIOFailureError creates a new IOFailureError.
+func NewIOFailureError(adapter, operation string, cause error) *IOFailureError {
+	return &IOFailureError{Adapter: adapter, Operation: operation, Cause: cause}
+}
+
+// NewConnectionError creates a new ConnectionError.
+func NewConnectionError(host string, port int, message string, cause error) *ConnectionError {
+	return &ConnectionError{Host: host, Port: port, Message: message, Cause: cause}
+}
+
+// NewModbusError creates a new ModbusError.
+func NewModbusError(functionCode, exceptionCode byte, message string) *ModbusError {
+	return &ModbusError{FunctionCode: functionCode, ExceptionCode: exceptionCode, Message: message}
 }

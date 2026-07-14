@@ -1,0 +1,16 @@
+{
+  "name": "modbus_offline",
+  "description": "Modbus I/O module is offline. Connection fails. I/O failure must NOT be treated as normal state.",
+  "module": "8DI/8DO Isolated Modbus",
+  "protocol": "Modbus TCP",
+  "faultInjection": {
+    "failOnConnect": true,
+    "failOnRead": true,
+    "failOnWrite": true,
+    "timeoutOnRead": false
+  },
+  "digitalInputs": [],
+  "expectedEquipmentState": "UNKNOWN",
+  "expectedQuality": "BAD",
+  "safetyNote": "I/O failure must NEVER be treated as normal or safe state. Equipment state must remain UNKNOWN until communication is restored and valid data is received."
+}
