@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://safegai.thingswell.co.kr/contracts/events/safety-decision-v1.schema.json",
+  "title": "SafetyDecisionEvent",
+  "description": "Safety rule evaluation result. Deterministic outcome from occupancy and equipment state combination.",
+  "type": "object",
+  "allOf": [
+    { "$ref": "event-envelope-v1.schema.json" }
+  ],
+  "properties": {
+    "decision": {
+      "$ref": "#/$defs/SafetyDecision",
+      "description": "The safety decision outcome"
+    },
+    "ruleId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Identifier of the safety rule that produced this decision"
+    },
+    "occupancyState": {
+      "type": "string",
+      "enum": ["OCCUPIED", "VACANT_PENDING", "VACANT_CONFIRMED", "UNKNOWN", "STALE"],
+      "description": "Occupancy state input to the decision"
+    },
+    "equipmentState": {
+      "type": "string",
+      "enum": ["RUNNING", "STOPPED", "RESTART_REQUESTED", "UNKNOWN"],
+      "description": "Equipment state input to the decision"
+    },
+    "reason": {
+      "type": "string",
+      "description": "Human-readable explanation of the decision"
+    },
+    "actions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of actions triggered by this decision"
+    }
+  },
+  "required": ["decision", "ruleId", "occupancyState", "equipmentState", "reason"],
+  "$defs": {
+    "SafetyDecision": {
+      "type": "string",
+      "enum": [
+        "SAFE",
+        "WARNING",
+        "STOP_REQUEST_REQUIRED",
+        "RESTART_INTERLOCK",
+        "SAFETY_CONFIRMATION_UNAVAILABLE",
+        "MAINTENANCE_MONITORING"
+      ],
+      "description": "Safety decision outcomes. STOP_REQUEST_REQUIRED triggers actuation via PLC or Safety Relay."
+    }
+  }
+}
