@@ -1,0 +1,5 @@
+# Build outputs
+dist/
+
+# Agent working files
+.agents/
