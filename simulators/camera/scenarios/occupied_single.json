@@ -1,0 +1,35 @@
+{
+  "name": "occupied_single",
+  "description": "Single person enters and remains in zone-A. Generates person_detected events with high confidence.",
+  "cameraId": "cam-sim-001",
+  "events": [
+    {
+      "zoneId": "zone-A",
+      "eventType": "person_detected",
+      "personCount": 1,
+      "confidence": 0.95,
+      "timestampOffsetMs": 0
+    },
+    {
+      "zoneId": "zone-A",
+      "eventType": "person_detected",
+      "personCount": 1,
+      "confidence": 0.92,
+      "timestampOffsetMs": 500
+    },
+    {
+      "zoneId": "zone-A",
+      "eventType": "person_detected",
+      "personCount": 1,
+      "confidence": 0.97,
+      "timestampOffsetMs": 1000
+    },
+    {
+      "zoneId": "zone-A",
+      "eventType": "person_detected",
+      "personCount": 1,
+      "confidence": 0.94,
+      "timestampOffsetMs": 1500
+    }
+  ]
+}
