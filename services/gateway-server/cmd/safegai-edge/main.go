@@ -1,6 +1,6 @@
 // Package main is the entry point for the SafeGAI edge gateway server.
 // It provides health endpoints, structured JSON logging, configuration loading,
-// and graceful shutdown via OS signal handling.
+// local REST API with RBAC, cloud outbox sync, and graceful shutdown.
 package main
 
 import (
@@ -14,6 +14,11 @@ import (
 	"sync/atomic"
 	"syscall"
 	"time"
+
+	"github.com/thingswell-hjlee/safegai-iot-automation/services/gateway-server/internal/auth"
+	"github.com/thingswell-hjlee/safegai-iot-automation/services/gateway-server/internal/httpapi"
+	"github.com/thingswell-hjlee/safegai-iot-automation/services/gateway-server/internal/observability"
+	"github.com/thingswell-hjlee/safegai-iot-automation/services/gateway-server/internal/storage/memory"
 )
 
 const (
@@ -56,9 +61,27 @@ func main() {
 	logJSON("info", "SafeGAI edge gateway starting", "main")
 	logJSON("info", fmt.Sprintf("Listening on %s", cfg.Addr), "main")
 
+	// Initialize storage (in-memory for now; SQLite when driver is available)
+	store := memory.NewStore()
+
+	// Initialize session store with a secret (from env in production)
+	sessionSecret := []byte(os.Getenv("SAFEGAI_SESSION_SECRET"))
+	if len(sessionSecret) == 0 {
+		sessionSecret = []byte("default-dev-secret-do-not-use-in-prod")
+	}
+	sessionStore := auth.NewSessionStore(sessionSecret)
+
+	// Initialize health collector
+	healthCollector := observability.NewHealthCollector()
+
+	// Initialize HTTP API
+	handlers := httpapi.NewHandlers(store, sessionStore, healthCollector)
+	router := httpapi.NewRouter(handlers, sessionStore)
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health/live", handleLive)
 	mux.HandleFunc("/health/ready", handleReady)
+	mux.Handle("/api/", router)
 
 	server := &http.Server{
 		Addr:         cfg.Addr,
@@ -79,6 +102,8 @@ func main() {
 		}
 		close(errCh)
 	}()
+
+	logJSON("info", "SafeGAI edge gateway ready", "main")
 
 	// Wait for shutdown signal.
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
