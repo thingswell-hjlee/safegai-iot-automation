@@ -1,0 +1,25 @@
+{
+  "name": "@safegai/infra-aws",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SafeGAI AWS CDK Infrastructure - ap-northeast-2",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "synth": "cdk synth",
+    "diff": "cdk diff",
+    "deploy": "cdk deploy",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.120.0",
+    "constructs": "^10.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.3.3",
+    "aws-cdk": "^2.120.0"
+  }
+}
