@@ -1,0 +1,35 @@
+{
+  "name": "vacant_exit",
+  "description": "Person detected in zone-A then leaves. Reports person_not_detected. NOTE: The camera adapter NEVER emits VACANT_CONFIRMED. Only the Zone State Engine determines vacancy after a timeout.",
+  "cameraId": "cam-sim-001",
+  "events": [
+    {
+      "zoneId": "zone-A",
+      "eventType": "person_detected",
+      "personCount": 1,
+      "confidence": 0.90,
+      "timestampOffsetMs": 0
+    },
+    {
+      "zoneId": "zone-A",
+      "eventType": "person_detected",
+      "personCount": 1,
+      "confidence": 0.88,
+      "timestampOffsetMs": 1000
+    },
+    {
+      "zoneId": "zone-A",
+      "eventType": "person_not_detected",
+      "personCount": 0,
+      "confidence": 0.85,
+      "timestampOffsetMs": 3000
+    },
+    {
+      "zoneId": "zone-A",
+      "eventType": "person_not_detected",
+      "personCount": 0,
+      "confidence": 0.93,
+      "timestampOffsetMs": 6000
+    }
+  ]
+}
