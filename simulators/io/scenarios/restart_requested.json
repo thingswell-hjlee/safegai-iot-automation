@@ -1,0 +1,19 @@
+{
+  "name": "restart_requested",
+  "description": "Restart has been requested. DI[1] (restart request from operator panel) is active.",
+  "module": "8DI/8DO Isolated Modbus",
+  "protocol": "Modbus TCP",
+  "digitalInputs": [
+    { "address": 0, "value": false, "signal": "equipment_running", "source": "PLC" },
+    { "address": 1, "value": true,  "signal": "restart_requested", "source": "operator_panel" },
+    { "address": 2, "value": false, "signal": "output_feedback",   "source": "PLC/Safety Relay" },
+    { "address": 3, "value": false, "signal": "reserved",          "source": "-" },
+    { "address": 4, "value": false, "signal": "reserved",          "source": "-" },
+    { "address": 5, "value": false, "signal": "reserved",          "source": "-" },
+    { "address": 6, "value": false, "signal": "reserved",          "source": "-" },
+    { "address": 7, "value": false, "signal": "reserved",          "source": "-" }
+  ],
+  "expectedEquipmentState": "RESTART_REQUESTED",
+  "expectedQuality": "GOOD",
+  "safetyNote": "Restart request must be validated by safety rules before DO is asserted. Output goes to PLC/Safety Relay only."
+}

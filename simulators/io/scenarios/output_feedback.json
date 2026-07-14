@@ -1,0 +1,19 @@
+{
+  "name": "output_feedback",
+  "description": "Output feedback confirmed. DI[2] (PLC/Safety Relay acknowledge) is active after DO write.",
+  "module": "8DI/8DO Isolated Modbus",
+  "protocol": "Modbus TCP",
+  "digitalInputs": [
+    { "address": 0, "value": true,  "signal": "equipment_running", "source": "PLC" },
+    { "address": 1, "value": false, "signal": "restart_requested", "source": "operator_panel" },
+    { "address": 2, "value": true,  "signal": "output_feedback",   "source": "PLC/Safety Relay" },
+    { "address": 3, "value": false, "signal": "reserved",          "source": "-" },
+    { "address": 4, "value": false, "signal": "reserved",          "source": "-" },
+    { "address": 5, "value": false, "signal": "reserved",          "source": "-" },
+    { "address": 6, "value": false, "signal": "reserved",          "source": "-" },
+    { "address": 7, "value": false, "signal": "reserved",          "source": "-" }
+  ],
+  "expectedEquipmentState": "RUNNING",
+  "expectedQuality": "GOOD",
+  "safetyNote": "DI[2] confirms that PLC/Safety Relay has acknowledged a DO command. This is closed-loop feedback. DO commands are sent to PLC/Safety Relay only, not directly to equipment."
+}
