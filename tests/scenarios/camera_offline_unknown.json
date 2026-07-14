@@ -1,0 +1,58 @@
+{
+  "name": "camera_offline_unknown",
+  "description": "Camera going offline transitions zone to UNKNOWN state. UNKNOWN is not treated as vacancy.",
+  "preconditions": {
+    "zones": [
+      {
+        "zone_id": "zone-d",
+        "occupancy_state": "VACANT_CONFIRMED",
+        "equipment_state": "RUNNING"
+      }
+    ],
+    "cameras": [
+      { "camera_id": "cam-zone-d-01", "status": "ONLINE" }
+    ]
+  },
+  "steps": [
+    {
+      "timestamp": "2024-01-01T15:00:00.000Z",
+      "event_type": "camera_event",
+      "payload": {
+        "camera_id": "cam-zone-d-01",
+        "zone_id": "zone-d",
+        "event_type": "CAMERA_OFFLINE",
+        "confidence": 1.0,
+        "timestamp": "2024-01-01T15:00:00.000Z"
+      },
+      "description": "Camera goes offline"
+    },
+    {
+      "timestamp": "2024-01-01T15:00:01.000Z",
+      "event_type": "occupancy_state",
+      "payload": {
+        "zone_id": "zone-d",
+        "state": "UNKNOWN",
+        "previous_state": "VACANT_CONFIRMED",
+        "confidence": 0.0,
+        "source_camera_ids": [],
+        "timestamp": "2024-01-01T15:00:01.000Z"
+      },
+      "description": "Zone transitions to UNKNOWN due to camera loss"
+    }
+  ],
+  "expected_states": [
+    {
+      "zone_id": "zone-d",
+      "occupancy_state": "UNKNOWN",
+      "equipment_state": "RUNNING"
+    }
+  ],
+  "expected_outputs": [
+    {
+      "type": "safety_decision",
+      "decision": "STOP_REQUEST_REQUIRED",
+      "zone_id": "zone-d",
+      "reason": "UNKNOWN state with running equipment - cannot confirm vacancy"
+    }
+  ]
+}

@@ -55,7 +55,7 @@ test:
 	@if [ -f package.json ]; then npm test --if-present; fi
 
 test-contract: check-json
-	@if [ -f package.json ]; then npm run test:contract --if-present; fi
+	@./scripts/run-contract-tests.sh
 
 test-integration:
 	@if [ -f package.json ]; then npm run test:integration --if-present; fi
