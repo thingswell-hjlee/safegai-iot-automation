@@ -1,0 +1,37 @@
+{
+  "id": "FEAT-003",
+  "type": "feat",
+  "description": "Wave 0 - M11 Quality Framework: Create test infrastructure, contract validation tooling, CI-compatible test runners, and scenario test framework. Branch: feat/m11-quality-framework",
+  "status": "pending",
+  "steps": [
+    "Create branch feat/m11-quality-framework from main",
+    "Create tests/contract/validate_schemas_test.go that loads all contracts/*.schema.json and validates them as valid JSON Schema",
+    "Create tests/contract/validate_envelope_test.go that validates sample events against event-envelope-v1.schema.json",
+    "Create tests/scenarios/README.md explaining scenario runner format (YAML/JSON based)",
+    "Create tests/scenarios/schema.json defining the scenario file format",
+    "Create tests/scenarios/basic_occupied_running.json - basic scenario: Zone OCCUPIED + Equipment RUNNING = STOP_REQUEST",
+    "Create tests/scenarios/stale_no_restart.json - STALE state blocks restart",
+    "Create tests/scenarios/vacant_confirmed_safe.json - VACANT_CONFIRMED allows normal operation",
+    "Create tests/scenarios/camera_offline_unknown.json - camera offline = UNKNOWN, not VACANT",
+    "Create scripts/run-contract-tests.sh that validates all JSON schemas and runs contract tests",
+    "Create scripts/run-scenario-tests.sh placeholder that will be completed when the engine exists",
+    "Update Makefile test-contract target to call scripts/run-contract-tests.sh",
+    "Ensure make test-contract passes with the new validation",
+    "Create tests/unit/README.md explaining test conventions for the project",
+    "Commit all changes"
+  ],
+  "acceptance_criteria": [
+    "make test-contract passes validating all schema files",
+    "Scenario JSON files are valid against their schema",
+    "Test infrastructure is reusable by subsequent module PRs",
+    "Contract tests verify that VACANT_CONFIRMED is the only valid vacancy state",
+    "make verify-fast passes"
+  ],
+  "verification": [
+    "make test-contract succeeds",
+    "make verify-fast succeeds",
+    "python3 scripts/check-json.py succeeds (all JSON files valid)"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

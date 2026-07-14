@@ -1,0 +1,53 @@
+{
+  "id": "FEAT-012",
+  "type": "feat",
+  "description": "Wave 1 - M10 Operations and Maintenance: Implement SQLite storage, event/audit store, cloud outbox, health monitoring, config versioning, and local REST API. Branch: feat/m10-ops-maintenance",
+  "status": "pending",
+  "steps": [
+    "Create branch feat/m10-ops-maintenance from main",
+    "Create services/gateway-server/internal/storage/sqlite/migrations.go with schema migration management",
+    "Create services/gateway-server/internal/storage/sqlite/store.go with SQLite WAL connection management",
+    "Create services/gateway-server/internal/storage/sqlite/store_test.go testing WAL mode, connection, graceful close",
+    "Create services/gateway-server/internal/storage/sqlite/events.go implementing event CRUD: InsertEvent, GetEvent, ListEvents, AckEvent, ResolveEvent",
+    "Create services/gateway-server/internal/storage/sqlite/events_test.go",
+    "Create services/gateway-server/internal/storage/sqlite/audit.go implementing audit log: InsertAudit, ListAudits",
+    "Create services/gateway-server/internal/storage/sqlite/audit_test.go",
+    "Create services/gateway-server/internal/storage/sqlite/outbox.go implementing cloud outbox: Enqueue, Dequeue, MarkSent, GetPending, GetDepth",
+    "Create services/gateway-server/internal/storage/sqlite/outbox_test.go testing transactional insert and dequeue",
+    "Create services/gateway-server/internal/storage/sqlite/config.go implementing config version store",
+    "Create services/gateway-server/internal/storage/sqlite/schema.sql with all tables: events, occupancy_states, equipment_states, safety_decisions, actuation_results, audit_logs, cloud_outbox, config_versions, users",
+    "Create services/gateway-server/internal/cloud/outbox/sync.go with exponential backoff sync logic",
+    "Create services/gateway-server/internal/cloud/outbox/sync_test.go",
+    "Create services/gateway-server/internal/observability/health.go with hardware/SSD/network health collection",
+    "Create services/gateway-server/internal/observability/health_test.go",
+    "Create services/gateway-server/internal/httpapi/router.go with local REST API routes matching docs/GATEWAY_PRODUCT_SPEC.md section 19",
+    "Create services/gateway-server/internal/httpapi/handlers.go with handler implementations",
+    "Create services/gateway-server/internal/httpapi/router_test.go testing route registration",
+    "Create services/gateway-server/internal/auth/rbac.go with role-based access control (USER, OPERATOR, MAINTAINER)",
+    "Create services/gateway-server/internal/auth/rbac_test.go testing permission enforcement",
+    "Ensure all time stored as UTC",
+    "Ensure event ID uniqueness enforced",
+    "Ensure outbox uses transactional insert with event",
+    "Run make build and make test",
+    "Commit all changes"
+  ],
+  "acceptance_criteria": [
+    "SQLite WAL mode is configured correctly",
+    "All tables from schema match GATEWAY_PRODUCT_SPEC section 17",
+    "Event store enforces unique event IDs",
+    "Outbox transactionally inserts with event storage",
+    "Cloud sync uses exponential backoff",
+    "RBAC enforces role permissions matching ROLE_MODE_SPEC",
+    "Local API routes match GATEWAY_PRODUCT_SPEC section 19",
+    "All timestamps stored as UTC",
+    "make build succeeds",
+    "make test succeeds"
+  ],
+  "verification": [
+    "make build succeeds",
+    "make test succeeds",
+    "make verify-fast succeeds"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}
