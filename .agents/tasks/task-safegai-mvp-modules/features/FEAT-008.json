@@ -1,0 +1,39 @@
+{
+  "id": "FEAT-008",
+  "type": "feat",
+  "description": "Wave 1 - M05 Activity Engine: Implement fixed safety rule evaluator combining occupancy and equipment state. Branch: feat/m05-activity-engine. This is R3 safety-critical.",
+  "status": "pending",
+  "steps": [
+    "Create branch feat/m05-activity-engine from main",
+    "Create services/gateway-server/internal/domain/safety/decision.go with SafetyDecision types: SAFE, WARNING, STOP_REQUEST_REQUIRED, RESTART_INTERLOCK, SAFETY_CONFIRMATION_UNAVAILABLE, MAINTENANCE_MONITORING",
+    "Create services/gateway-server/internal/domain/safety/rules.go implementing fixed safety rules R-01 through R-05 from PRODUCT_MVP_SPEC",
+    "Create services/gateway-server/internal/domain/safety/evaluator.go with Evaluator that takes zone occupancy + equipment state and produces SafetyDecision",
+    "Create services/gateway-server/internal/domain/safety/evaluator_test.go with truth table tests: R-01 (OCCUPIED+RUNNING=STOP_REQUEST), R-02 (RESTART_REQUESTED+not_VACANT_CONFIRMED=INTERLOCK), R-03 (UNKNOWN/STALE=UNAVAILABLE), R-04 (WORK_WINDOW+STOPPED=MAINTENANCE), R-05 (duplicate suppression)",
+    "Create services/gateway-server/internal/domain/safety/rules_test.go testing each rule independently",
+    "Create services/gateway-server/internal/domain/safety/workwindow.go for maintenance work window state management",
+    "Create services/gateway-server/internal/domain/safety/workwindow_test.go",
+    "Ensure UNKNOWN and STALE states always block restart (never satisfy vacancy)",
+    "Ensure no automatic restart from AI vacancy alone",
+    "Ensure rules are deterministic - same input always produces same output",
+    "Document R3 classification in code comments",
+    "Run make build and make test",
+    "Commit all changes"
+  ],
+  "acceptance_criteria": [
+    "All 5 safety rules (R-01 to R-05) are implemented and tested",
+    "Truth table tests cover every combination of zone state + equipment state",
+    "UNKNOWN and STALE always result in RESTART_INTERLOCK when restart is requested",
+    "No automatic restart permitted from AI vacancy alone",
+    "Duplicate event suppression prevents duplicate output commands (R-05)",
+    "Safety decisions are deterministic",
+    "make build succeeds",
+    "make test succeeds"
+  ],
+  "verification": [
+    "make build succeeds",
+    "make test succeeds",
+    "make verify-fast succeeds"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

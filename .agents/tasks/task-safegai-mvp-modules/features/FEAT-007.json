@@ -1,0 +1,38 @@
+{
+  "id": "FEAT-007",
+  "type": "feat",
+  "description": "Wave 1 - M04 Zone State Engine: Implement occupancy state machine with all transitions, fail-safe logic, and vacancy confirmation. Branch: feat/m04-zone-state-engine. This is R3 safety-critical.",
+  "status": "pending",
+  "steps": [
+    "Create branch feat/m04-zone-state-engine from main",
+    "Create services/gateway-server/internal/domain/occupancy/state.go with OccupancyState enum and ZoneState struct",
+    "Create services/gateway-server/internal/domain/occupancy/machine.go implementing the state machine with transitions: UNKNOWN->OCCUPIED, UNKNOWN->VACANT_PENDING, OCCUPIED->VACANT_PENDING, VACANT_PENDING->VACANT_CONFIRMED, VACANT_PENDING->OCCUPIED, ANY->STALE, STALE->OCCUPIED, STALE->VACANT_PENDING",
+    "Create services/gateway-server/internal/domain/occupancy/config.go with configurable parameters: VacancyConfirmDuration(3s), VacancyConfirmSamples(3), StaleTimeout(10s), CameraOfflineTimeout(30s), DedupWindow(2s)",
+    "Create services/gateway-server/internal/domain/occupancy/machine_test.go with comprehensive truth table tests covering every valid transition",
+    "Create services/gateway-server/internal/domain/occupancy/forbidden_test.go explicitly testing forbidden transitions: data timeout -> VACANT_CONFIRMED (must fail), camera offline -> VACANT_CONFIRMED (must fail), count parse failure -> VACANT_CONFIRMED (must fail)",
+    "Create services/gateway-server/internal/domain/occupancy/staleness.go implementing stale detection based on configurable timeout",
+    "Create services/gateway-server/internal/domain/occupancy/staleness_test.go",
+    "Ensure default initial state is UNKNOWN for all zones",
+    "Ensure only VACANT_CONFIRMED satisfies vacancy condition - add explicit IsSafeVacant() method that returns true ONLY for VACANT_CONFIRMED",
+    "Document in code comments that this module is R3 and requires T1+T2 approval",
+    "Run make build and make test",
+    "Commit all changes"
+  ],
+  "acceptance_criteria": [
+    "State machine implements all 5 states: OCCUPIED, VACANT_PENDING, VACANT_CONFIRMED, UNKNOWN, STALE",
+    "All valid transitions are tested with truth table",
+    "Forbidden transitions (to VACANT_CONFIRMED from invalid states) are explicitly tested and rejected",
+    "IsSafeVacant() returns true ONLY for VACANT_CONFIRMED",
+    "Initial state is always UNKNOWN",
+    "Camera offline produces UNKNOWN, never VACANT",
+    "make build succeeds",
+    "make test succeeds with all state machine tests passing"
+  ],
+  "verification": [
+    "make build succeeds",
+    "make test succeeds",
+    "make verify-fast succeeds"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

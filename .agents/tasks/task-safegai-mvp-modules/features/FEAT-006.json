@@ -1,0 +1,42 @@
+{
+  "id": "FEAT-006",
+  "type": "feat",
+  "description": "Wave 1 - M03 Device and Sensor Input: Implement equipment state and DI/DO interfaces with Modbus simulator. Branch: feat/m03-device-sensor-input",
+  "status": "pending",
+  "steps": [
+    "Create branch feat/m03-device-sensor-input from main",
+    "Create services/gateway-server/internal/adapters/io/interface.go defining IOAdapter interface: Connect, ReadDI, WriteDO, Health, Close",
+    "Create services/gateway-server/internal/adapters/io/types.go with DIState, DOCommand, IOHealth, ModbusConfig structs",
+    "Create services/gateway-server/internal/adapters/io/simulator/simulator.go implementing IOAdapter for testing",
+    "Create services/gateway-server/internal/adapters/io/simulator/scenarios.go with scenarios: running, stopped, restart_requested, offline, timeout",
+    "Create services/gateway-server/internal/domain/equipment/state.go with EquipmentState (RUNNING, STOPPED, RESTART_REQUESTED, UNKNOWN) and TTL/quality tracking",
+    "Create services/gateway-server/internal/domain/equipment/state_test.go testing state transitions and staleness detection",
+    "Create services/gateway-server/internal/domain/equipment/manager.go managing multiple equipment states with polling logic",
+    "Create services/gateway-server/internal/domain/equipment/manager_test.go",
+    "Create simulators/io/README.md documenting I/O simulator usage",
+    "Create simulators/io/scenarios/equipment_running.json",
+    "Create simulators/io/scenarios/equipment_stopped.json",
+    "Create simulators/io/scenarios/restart_requested.json",
+    "Create simulators/io/scenarios/modbus_offline.json",
+    "Create simulators/io/scenarios/output_feedback.json",
+    "Ensure stale DI input maps to UNKNOWN equipment state",
+    "Ensure no direct power switching logic (outputs go to PLC/Safety Relay only)",
+    "Run make build and make test",
+    "Commit all changes"
+  ],
+  "acceptance_criteria": [
+    "IOAdapter interface supports 8DI/8DO as per spec",
+    "Equipment state correctly transitions to UNKNOWN on stale input",
+    "Simulator can produce all scenario types",
+    "No direct machine power control logic exists",
+    "make build succeeds",
+    "make test succeeds"
+  ],
+  "verification": [
+    "make build succeeds",
+    "make test succeeds",
+    "make verify-fast succeeds"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}
