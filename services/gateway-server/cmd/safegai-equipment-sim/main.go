@@ -74,12 +74,12 @@ var equipmentList = []Equipment{
 
 // SimState tracks simulator state.
 type SimState struct {
-	mu         sync.RWMutex
-	running    bool
-	equipment  []Equipment
-	events     []EquipmentEvent
-	totalSent  int64
-	startTime  time.Time
+	mu        sync.RWMutex
+	running   bool
+	equipment []Equipment
+	events    []EquipmentEvent
+	totalSent int64
+	startTime time.Time
 }
 
 var state = &SimState{}

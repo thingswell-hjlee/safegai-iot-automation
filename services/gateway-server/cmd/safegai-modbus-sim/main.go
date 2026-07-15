@@ -35,13 +35,13 @@ const (
 
 // SimState tracks the Modbus register state.
 type SimState struct {
-	mu            sync.RWMutex
-	running       bool
-	digitalInputs [numDI]bool
+	mu             sync.RWMutex
+	running        bool
+	digitalInputs  [numDI]bool
 	digitalOutputs [numDO]bool
-	totalReads    int64
-	totalWrites   int64
-	startTime     time.Time
+	totalReads     int64
+	totalWrites    int64
+	startTime      time.Time
 }
 
 var state = &SimState{}

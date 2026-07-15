@@ -17,13 +17,13 @@ import (
 )
 
 const (
-	defaultAddr      = ":9001"
-	defaultGateway   = "http://localhost:8080"
-	defaultInterval  = 2 * time.Second
-	numCameras       = 4
-	zonesPerCamera   = 2
-	totalZones       = numCameras * zonesPerCamera
-	version          = "0.1.0"
+	defaultAddr     = ":9001"
+	defaultGateway  = "http://localhost:8080"
+	defaultInterval = 2 * time.Second
+	numCameras      = 4
+	zonesPerCamera  = 2
+	totalZones      = numCameras * zonesPerCamera
+	version         = "0.1.0"
 )
 
 // CameraEvent mirrors ports.CameraEvent for simulator output.
@@ -40,12 +40,12 @@ type CameraEvent struct {
 
 // SimState tracks the simulator's current state.
 type SimState struct {
-	mu         sync.RWMutex
-	running    bool
-	events     []CameraEvent
-	seqNo      int64
-	totalSent  int64
-	startTime  time.Time
+	mu        sync.RWMutex
+	running   bool
+	events    []CameraEvent
+	seqNo     int64
+	totalSent int64
+	startTime time.Time
 }
 
 var (
