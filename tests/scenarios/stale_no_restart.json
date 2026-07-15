@@ -1,0 +1,46 @@
+{
+  "name": "stale_no_restart",
+  "description": "STALE occupancy state blocks equipment restart. STALE is not treated as vacancy.",
+  "preconditions": {
+    "zones": [
+      {
+        "zone_id": "zone-b",
+        "occupancy_state": "STALE",
+        "equipment_state": "STOPPED"
+      }
+    ],
+    "cameras": [
+      { "camera_id": "cam-zone-b-01", "status": "ONLINE" }
+    ]
+  },
+  "steps": [
+    {
+      "timestamp": "2024-01-01T13:00:00.000Z",
+      "event_type": "equipment_state",
+      "payload": {
+        "equipment_id": "equip-b-01",
+        "zone_id": "zone-b",
+        "state": "STARTING",
+        "previous_state": "STOPPED",
+        "timestamp": "2024-01-01T13:00:00.000Z",
+        "source": "MANUAL"
+      },
+      "description": "Manual restart attempt while zone is STALE"
+    }
+  ],
+  "expected_states": [
+    {
+      "zone_id": "zone-b",
+      "occupancy_state": "STALE",
+      "equipment_state": "STOPPED"
+    }
+  ],
+  "expected_outputs": [
+    {
+      "type": "safety_decision",
+      "decision": "HOLD_CURRENT_STATE",
+      "zone_id": "zone-b",
+      "reason": "STALE state blocks restart - cannot confirm vacancy"
+    }
+  ]
+}

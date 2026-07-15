@@ -1,0 +1,28 @@
+{
+  "name": "out_of_order",
+  "description": "Events arriving with timestamps that are not in chronological order. Tests that the system handles late-arriving events correctly.",
+  "cameraId": "cam-sim-001",
+  "events": [
+    {
+      "zoneId": "zone-A",
+      "eventType": "person_detected",
+      "personCount": 1,
+      "confidence": 0.95,
+      "timestampOffsetMs": 2000
+    },
+    {
+      "zoneId": "zone-A",
+      "eventType": "person_detected",
+      "personCount": 2,
+      "confidence": 0.90,
+      "timestampOffsetMs": 0
+    },
+    {
+      "zoneId": "zone-A",
+      "eventType": "person_not_detected",
+      "personCount": 0,
+      "confidence": 0.88,
+      "timestampOffsetMs": 5000
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "name": "duplicate_event_suppression",
+  "description": "Duplicate events within suppression window are suppressed and do not generate additional decisions.",
+  "preconditions": {
+    "zones": [
+      {
+        "zone_id": "zone-e",
+        "occupancy_state": "VACANT_CONFIRMED",
+        "equipment_state": "RUNNING"
+      }
+    ],
+    "cameras": [
+      { "camera_id": "cam-zone-e-01", "status": "ONLINE" }
+    ]
+  },
+  "steps": [
+    {
+      "timestamp": "2024-01-01T16:00:00.000Z",
+      "event_type": "camera_event",
+      "payload": {
+        "camera_id": "cam-zone-e-01",
+        "zone_id": "zone-e",
+        "event_type": "PERSON_DETECTED",
+        "confidence": 0.90,
+        "timestamp": "2024-01-01T16:00:00.000Z"
+      },
+      "description": "First person detection event"
+    },
+    {
+      "timestamp": "2024-01-01T16:00:00.500Z",
+      "event_type": "camera_event",
+      "payload": {
+        "camera_id": "cam-zone-e-01",
+        "zone_id": "zone-e",
+        "event_type": "PERSON_DETECTED",
+        "confidence": 0.91,
+        "timestamp": "2024-01-01T16:00:00.500Z"
+      },
+      "description": "Duplicate detection within 1-second suppression window"
+    },
+    {
+      "timestamp": "2024-01-01T16:00:00.800Z",
+      "event_type": "camera_event",
+      "payload": {
+        "camera_id": "cam-zone-e-01",
+        "zone_id": "zone-e",
+        "event_type": "PERSON_DETECTED",
+        "confidence": 0.92,
+        "timestamp": "2024-01-01T16:00:00.800Z"
+      },
+      "description": "Third duplicate within suppression window"
+    }
+  ],
+  "expected_states": [
+    {
+      "zone_id": "zone-e",
+      "occupancy_state": "OCCUPIED",
+      "equipment_state": "RUNNING"
+    }
+  ],
+  "expected_outputs": [
+    {
+      "type": "safety_decision",
+      "decision": "STOP_REQUEST_REQUIRED",
+      "zone_id": "zone-e",
+      "reason": "Zone occupied while equipment is running"
+    },
+    {
+      "type": "suppressed",
+      "decision": "DUPLICATE_SUPPRESSED",
+      "zone_id": "zone-e",
+      "reason": "Duplicate event within suppression window"
+    }
+  ]
+}

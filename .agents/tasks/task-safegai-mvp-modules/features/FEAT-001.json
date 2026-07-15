@@ -1,0 +1,26 @@
+{
+  "id": "FEAT-001",
+  "type": "docs",
+  "description": "Create MODULE_PLAN.md with full module dependency graph and wave plan. Document all 12 modules (M00-M11), their dependencies, interfaces, and wave assignment.",
+  "status": "in_progress",
+  "steps": [
+    "Create docs/MODULE_PLAN.md with sections for each module M00-M11",
+    "For each module include: purpose, wave assignment, dependencies, inputs, outputs, key interfaces",
+    "Create ASCII dependency graph showing module relationships",
+    "Document Wave 0 (M00, M01, M11), Wave 1 (M02-M06, M08-M10), Wave 2 (M07 integration) ordering",
+    "Document shared contracts that all modules reference from contracts/ directory",
+    "Note safety boundaries: which modules are R3 (M04, M05, M06) vs R1/R2"
+  ],
+  "acceptance_criteria": [
+    "docs/MODULE_PLAN.md exists with all 12 modules documented",
+    "Dependency graph shows clear layering (foundation -> adapters -> engines -> outputs)",
+    "Safety-critical modules (R3) are clearly marked",
+    "Wave ordering respects dependency constraints"
+  ],
+  "verification": [
+    "File docs/MODULE_PLAN.md exists and is valid markdown",
+    "All module IDs M00-M11 are present in the document"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

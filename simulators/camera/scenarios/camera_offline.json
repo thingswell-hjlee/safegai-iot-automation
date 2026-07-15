@@ -1,0 +1,21 @@
+{
+  "name": "camera_offline",
+  "description": "Camera goes offline. Maps to UNKNOWN occupancy state. Camera offline NEVER maps to VACANT. Safety rule: when detection is unavailable, assume potential occupancy.",
+  "cameraId": "cam-sim-001",
+  "events": [
+    {
+      "zoneId": "zone-A",
+      "eventType": "person_detected",
+      "personCount": 1,
+      "confidence": 0.95,
+      "timestampOffsetMs": 0
+    },
+    {
+      "zoneId": "",
+      "eventType": "offline",
+      "personCount": 0,
+      "confidence": 0.0,
+      "timestampOffsetMs": 2000
+    }
+  ]
+}

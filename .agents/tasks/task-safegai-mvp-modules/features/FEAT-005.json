@@ -1,0 +1,43 @@
+{
+  "id": "FEAT-005",
+  "type": "feat",
+  "description": "Wave 1 - M02 Camera Adapter: Implement camera event adapter with simulator support, event normalization, and health monitoring. Branch: feat/m02-camera-adapter",
+  "status": "pending",
+  "steps": [
+    "Create branch feat/m02-camera-adapter from main",
+    "Create services/gateway-server/internal/adapters/camera/interface.go defining CameraAdapter interface: Connect, Health, SubscribeEvents, GetSnapshot, GetCapabilities, Close",
+    "Create services/gateway-server/internal/adapters/camera/types.go with RawCameraEvent, CameraHealth, CameraCapabilities structs",
+    "Create services/gateway-server/internal/adapters/camera/simulator/simulator.go implementing CameraAdapter for testing",
+    "Create services/gateway-server/internal/adapters/camera/simulator/scenarios.go with predefined scenarios: occupied, vacant, offline, duplicate, malformed",
+    "Create services/gateway-server/internal/domain/normalizer/normalizer.go that converts RawCameraEvent to domain EventEnvelope",
+    "Create services/gateway-server/internal/domain/normalizer/normalizer_test.go with tests for: valid event, missing fields rejection, duplicate suppression, timestamp validation",
+    "Create services/gateway-server/internal/domain/normalizer/dedup.go for duplicate event detection within configurable time window",
+    "Create services/gateway-server/internal/domain/normalizer/dedup_test.go testing dedup within 2s window",
+    "Create simulators/camera/README.md documenting simulator usage",
+    "Create simulators/camera/scenarios/occupied_single.json - single person enters zone",
+    "Create simulators/camera/scenarios/vacant_exit.json - person exits, transition to vacant",
+    "Create simulators/camera/scenarios/camera_offline.json - camera goes offline",
+    "Create simulators/camera/scenarios/duplicate_events.json - duplicate events within window",
+    "Create simulators/camera/scenarios/out_of_order.json - events arrive out of sequence order",
+    "Ensure camera adapter never produces VACANT_CONFIRMED directly (only raw occupied/not-detected)",
+    "Ensure camera offline maps to UNKNOWN, not VACANT",
+    "Run make build and make test to confirm compilation and tests pass",
+    "Commit all changes"
+  ],
+  "acceptance_criteria": [
+    "CameraAdapter interface is defined with all required methods",
+    "Simulator implements the interface and can produce various scenarios",
+    "Event normalizer correctly rejects malformed events",
+    "Duplicate events within 2s window are suppressed",
+    "Camera offline state produces UNKNOWN, never VACANT",
+    "make build succeeds",
+    "make test succeeds with all normalizer tests passing"
+  ],
+  "verification": [
+    "make build succeeds",
+    "make test succeeds",
+    "make verify-fast succeeds"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

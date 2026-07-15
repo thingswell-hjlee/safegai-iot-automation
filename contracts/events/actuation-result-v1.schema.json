@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://safegai.thingswell.co.kr/contracts/events/actuation-result-v1.schema.json",
+  "title": "ActuationResultEvent",
+  "description": "Result of an output command (DO, PLC request, alarm). Includes command ID and correlation for audit.",
+  "type": "object",
+  "allOf": [
+    { "$ref": "event-envelope-v1.schema.json" }
+  ],
+  "properties": {
+    "commandId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique command identifier for audit trail"
+    },
+    "commandType": {
+      "type": "string",
+      "enum": ["STOP_REQUEST", "WARNING_LIGHT", "WARNING_SIREN", "VOICE_ANNOUNCE", "DIGITAL_OUTPUT_TEST"],
+      "description": "Type of actuation command"
+    },
+    "targetDevice": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Target output device identifier"
+    },
+    "result": {
+      "type": "string",
+      "enum": ["SUCCESS", "FAILURE", "TIMEOUT", "REJECTED"],
+      "description": "Actuation outcome"
+    },
+    "errorDetail": {
+      "type": "string",
+      "description": "Error details if result is not SUCCESS"
+    },
+    "requestedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the command was requested"
+    },
+    "completedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the command completed or timed out"
+    },
+    "timeoutMs": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Configured timeout in milliseconds"
+    }
+  },
+  "required": ["commandId", "commandType", "targetDevice", "result", "requestedAt"]
+}

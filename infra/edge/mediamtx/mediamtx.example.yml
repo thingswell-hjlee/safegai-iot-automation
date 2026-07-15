@@ -1,0 +1,158 @@
+# MediaMTX Configuration - SafeGAI Edge Gateway
+# ==================================================
+#
+# This is a production-like template for MediaMTX configuration.
+# It defines up to 4 camera stream paths with codec passthrough.
+#
+# KEY CONSTRAINTS:
+# - Maximum 4 simultaneous camera streams
+# - No transcoding (codec passthrough only, H.264)
+# - No recording (all recording disabled)
+# - No ffmpeg or runOnReady scripts
+# - WebRTC preferred output, HLS as fallback
+# - On-demand connection (connect only when viewers exist)
+# - Source URL uses placeholder - actual credentials injected at runtime
+#
+# SECURITY:
+# - Camera credentials are NEVER stored in this file
+# - Credentials are loaded at runtime from local encrypted configuration
+# - This file is safe to commit to version control
+#
+# PERFORMANCE BUDGET:
+# - MediaMTX process + 4 streams must fit within 1GB total memory
+# - Estimated: ~50MB base + ~200MB per active stream = ~850MB peak
+# - 4-split mode: 640x360, 5-10fps, 768 Kbps max per channel
+# - Single full mode: 1920x1080, 10fps, 2048 Kbps max
+#
+# CODEC: H.264 substream passthrough only (no re-encoding)
+# PROTOCOL: RTSP input -> WebRTC/HLS output
+
+###############################################################################
+# Global Settings
+###############################################################################
+
+logLevel: info
+logDestinations: [stdout]
+
+###############################################################################
+# API (health monitoring and metrics)
+###############################################################################
+
+api: yes
+apiAddress: 127.0.0.1:9997
+
+###############################################################################
+# RTSP Server (source input from cameras)
+###############################################################################
+
+rtsp: yes
+rtspAddress: :8554
+protocols: [tcp]
+
+# RTSP authentication is handled per-path via source URL credentials
+# injected at runtime from encrypted config.
+
+###############################################################################
+# WebRTC Output (PREFERRED - low latency for live monitoring)
+###############################################################################
+
+webrtc: yes
+webrtcAddress: :8889
+
+# ICE servers for NAT traversal (configure per deployment)
+# webrtcICEServers2:
+#   - url: stun:stun.l.google.com:19302
+
+###############################################################################
+# HLS Output (FALLBACK - wider browser compatibility)
+###############################################################################
+
+hls: yes
+hlsAddress: :8888
+hlsAlwaysRemux: no
+
+# HLS segment settings for low-latency
+# hlsSegmentCount: 3
+# hlsSegmentDuration: 1s
+
+###############################################################################
+# Recording: DISABLED
+# SafeGAI design: NO recording at edge gateway.
+# Video evidence is handled separately if required.
+###############################################################################
+
+record: no
+
+###############################################################################
+# Stream Paths (max 4 simultaneous streams)
+#
+# Each path represents one camera source.
+# Source URL placeholder format: rtsp://{host}:{port}/{path}
+# Actual credentials are injected by the SafeGAI credential manager.
+###############################################################################
+
+paths:
+  # Camera 1 - Zone A primary view
+  cam-01:
+    # Source: RTSP stream from camera (credentials injected at runtime)
+    source: rtsp://CREDENTIAL_PLACEHOLDER:8554/cam-01
+    sourceProtocol: tcp
+    # On-demand: only connect when viewer requests this stream
+    sourceOnDemand: yes
+    sourceOnDemandStartTimeout: 10s
+    sourceOnDemandCloseAfter: 30s
+    # No recording for this path
+    record: no
+    # No runOnReady - codec passthrough only, no transcoding
+
+  # Camera 2 - Zone A secondary view
+  cam-02:
+    source: rtsp://CREDENTIAL_PLACEHOLDER:8554/cam-02
+    sourceProtocol: tcp
+    sourceOnDemand: yes
+    sourceOnDemandStartTimeout: 10s
+    sourceOnDemandCloseAfter: 30s
+    record: no
+    # No runOnReady - codec passthrough only, no transcoding
+
+  # Camera 3 - Zone B primary view
+  cam-03:
+    source: rtsp://CREDENTIAL_PLACEHOLDER:8554/cam-03
+    sourceProtocol: tcp
+    sourceOnDemand: yes
+    sourceOnDemandStartTimeout: 10s
+    sourceOnDemandCloseAfter: 30s
+    record: no
+    # No runOnReady - codec passthrough only, no transcoding
+
+  # Camera 4 - Zone B secondary view
+  cam-04:
+    source: rtsp://CREDENTIAL_PLACEHOLDER:8554/cam-04
+    sourceProtocol: tcp
+    sourceOnDemand: yes
+    sourceOnDemandStartTimeout: 10s
+    sourceOnDemandCloseAfter: 30s
+    record: no
+    # No runOnReady - codec passthrough only, no transcoding
+
+###############################################################################
+# Resource Limits (documented for deployment reference)
+#
+# Memory budget: 1GB total for MediaMTX + 4 streams
+#   - MediaMTX base: ~50MB
+#   - Per active stream: ~150-200MB (H.264 passthrough, no transcoding)
+#   - Peak (4 streams active): ~850MB
+#
+# Network bandwidth:
+#   - 4-split mode: 4 x 768 Kbps = 3072 Kbps (~3 Mbps inbound)
+#   - Single full: 2048 Kbps (~2 Mbps inbound)
+#   - Outbound per viewer: same as inbound (passthrough)
+#
+# CPU:
+#   - Minimal (no transcoding): typically < 5% of single core per stream
+#   - WebRTC ICE/DTLS negotiation: brief CPU spikes on viewer connect
+#
+# File descriptors:
+#   - ~50 base + ~10 per viewer connection
+#   - Recommended ulimit: 1024
+###############################################################################

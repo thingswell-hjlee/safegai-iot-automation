@@ -1,0 +1,30 @@
+# Build artifacts
+dist/
+cdk.out/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+*.js.map
+*.d.ts
+
+# Go
+*.exe
+*.test
+*.out
+
+# Environment
+.env
+.env.*
+
+# Task agent state
+.agents/

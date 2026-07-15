@@ -1,0 +1,61 @@
+{
+  "name": "vacant_confirmed_safe",
+  "description": "VACANT_CONFIRMED allows normal equipment operation. Only VACANT_CONFIRMED is treated as confirmed vacancy.",
+  "preconditions": {
+    "zones": [
+      {
+        "zone_id": "zone-c",
+        "occupancy_state": "VACANT_PENDING",
+        "equipment_state": "STOPPED"
+      }
+    ],
+    "cameras": [
+      { "camera_id": "cam-zone-c-01", "status": "ONLINE" },
+      { "camera_id": "cam-zone-c-02", "status": "ONLINE" }
+    ]
+  },
+  "steps": [
+    {
+      "timestamp": "2024-01-01T14:00:00.000Z",
+      "event_type": "occupancy_state",
+      "payload": {
+        "zone_id": "zone-c",
+        "state": "VACANT_CONFIRMED",
+        "previous_state": "VACANT_PENDING",
+        "confidence": 0.99,
+        "source_camera_ids": ["cam-zone-c-01", "cam-zone-c-02"],
+        "timestamp": "2024-01-01T14:00:00.000Z",
+        "dwell_seconds": 300
+      },
+      "description": "Zone confirmed vacant after dwell time"
+    },
+    {
+      "timestamp": "2024-01-01T14:00:05.000Z",
+      "event_type": "equipment_state",
+      "payload": {
+        "equipment_id": "equip-c-01",
+        "zone_id": "zone-c",
+        "state": "STARTING",
+        "previous_state": "STOPPED",
+        "timestamp": "2024-01-01T14:00:05.000Z",
+        "source": "SYSTEM"
+      },
+      "description": "Equipment start requested"
+    }
+  ],
+  "expected_states": [
+    {
+      "zone_id": "zone-c",
+      "occupancy_state": "VACANT_CONFIRMED",
+      "equipment_state": "RUNNING"
+    }
+  ],
+  "expected_outputs": [
+    {
+      "type": "safety_decision",
+      "decision": "OPERATION_PERMITTED",
+      "zone_id": "zone-c",
+      "reason": "Zone is VACANT_CONFIRMED - safe to operate"
+    }
+  ]
+}

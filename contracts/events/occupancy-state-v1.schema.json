@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://safegai.thingswell.co.kr/contracts/events/occupancy-state-v1.schema.json",
+  "title": "OccupancyStateEvent",
+  "description": "Zone occupancy state transition event. Only VACANT_CONFIRMED satisfies vacancy.",
+  "type": "object",
+  "allOf": [
+    { "$ref": "event-envelope-v1.schema.json" }
+  ],
+  "properties": {
+    "previousState": {
+      "$ref": "#/$defs/OccupancyState",
+      "description": "Previous occupancy state of the zone"
+    },
+    "currentState": {
+      "$ref": "#/$defs/OccupancyState",
+      "description": "Current occupancy state of the zone"
+    },
+    "transitionReason": {
+      "type": "string",
+      "description": "Human-readable reason for the state transition"
+    },
+    "dwellSeconds": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Duration in the previous state (seconds)"
+    },
+    "confirmationCount": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Number of consecutive vacancy confirmations received"
+    }
+  },
+  "required": ["previousState", "currentState", "transitionReason"],
+  "$defs": {
+    "OccupancyState": {
+      "type": "string",
+      "enum": ["OCCUPIED", "VACANT_PENDING", "VACANT_CONFIRMED", "UNKNOWN", "STALE"],
+      "description": "Zone occupancy states. UNKNOWN and STALE are never treated as vacancy."
+    }
+  }
+}

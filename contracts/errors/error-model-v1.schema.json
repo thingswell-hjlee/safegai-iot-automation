@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://safegai.thingswell.co.kr/contracts/errors/error-model-v1.schema.json",
+  "title": "ErrorModel",
+  "description": "Standard error response format for all SafeGAI API and internal error reporting.",
+  "type": "object",
+  "properties": {
+    "error": {
+      "$ref": "#/$defs/ErrorDetail"
+    }
+  },
+  "required": ["error"],
+  "$defs": {
+    "ErrorDetail": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Machine-readable error code (e.g. VALIDATION_ERROR, NOT_FOUND)"
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Human-readable error message"
+        },
+        "target": {
+          "type": "string",
+          "description": "The target of the error (field name, resource identifier)"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ErrorDetail"
+          },
+          "description": "Nested error details for validation errors"
+        },
+        "correlationId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Correlation ID for tracing"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the error occurred"
+        },
+        "retryable": {
+          "type": "boolean",
+          "description": "Whether the client should retry the request"
+        }
+      },
+      "required": ["code", "message"]
+    }
+  }
+}

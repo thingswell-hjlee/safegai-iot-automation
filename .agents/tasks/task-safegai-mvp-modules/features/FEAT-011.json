@@ -1,0 +1,45 @@
+{
+  "id": "FEAT-011",
+  "type": "feat",
+  "description": "Wave 1 - M09 AWS Cloud: Implement cloud backend Lambda handlers, CDK infrastructure definitions, DynamoDB schemas, and IoT topic contracts. Branch: feat/m09-aws-cloud",
+  "status": "pending",
+  "steps": [
+    "Create branch feat/m09-aws-cloud from main",
+    "Create services/cloud-backend/package.json with TypeScript, AWS SDK v3 types (structure only, no install)",
+    "Create services/cloud-backend/tsconfig.json",
+    "Create services/cloud-backend/src/handlers/ingest.ts implementing ingest-handler: schema validation, identity verification, idempotent event put, gateway health update, notification evaluation",
+    "Create services/cloud-backend/src/handlers/admin-api.ts implementing admin-api-handler: site/gateway status, event list/detail, ACK/resolve/classify, presigned URL",
+    "Create services/cloud-backend/src/domain/event.ts with TypeScript types matching contracts/events/ schemas",
+    "Create services/cloud-backend/src/domain/gateway.ts with Gateway inventory types",
+    "Create services/cloud-backend/src/domain/validation.ts with schema validation logic",
+    "Create services/cloud-backend/src/domain/validation.test.ts with unit tests for validation",
+    "Create infra/aws/bin/app.ts CDK app entry point",
+    "Create infra/aws/lib/foundation-stack.ts with base resources",
+    "Create infra/aws/lib/iot-stack.ts with IoT Core Thing, Certificate, Policy, Rules",
+    "Create infra/aws/lib/data-stack.ts with DynamoDB tables (Gateways, Events) and S3 bucket",
+    "Create infra/aws/lib/api-stack.ts with API Gateway HTTP API and Cognito",
+    "Create infra/aws/lib/web-stack.ts with CloudFront and S3 frontend hosting",
+    "Create infra/aws/package.json and tsconfig.json",
+    "Create contracts/mqtt/topics.md documenting MQTT topic structure: safegai/v1/{tenant}/{site}/{gateway}/{type}",
+    "Ensure NO machine control endpoint, topic, or shadow field exists",
+    "Ensure cloud-to-device settings are non-safety allowlist only",
+    "Ensure Gateway identity is validated per certificate/topic scope",
+    "Run python3 scripts/check-json.py to validate all JSON files",
+    "Commit all changes"
+  ],
+  "acceptance_criteria": [
+    "Ingest handler validates schema, identity, and idempotency",
+    "Admin API handler provides read operations and ACK/resolve only",
+    "No machine control API endpoint exists",
+    "No cloud-to-device safety command topic exists",
+    "DynamoDB schema matches docs/AWS_MVP_SPEC.md (Gateways PK=tenantId SK=siteId#gatewayId, Events PK=tenantId#siteId SK=detectedAt#eventId)",
+    "CDK stacks follow the layout in docs/AWS_MVP_SPEC.md",
+    "All JSON files pass validation"
+  ],
+  "verification": [
+    "python3 scripts/check-json.py succeeds",
+    "make verify-fast succeeds"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

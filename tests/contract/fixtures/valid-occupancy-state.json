@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "1.0.0",
+  "eventId": "550e8400-e29b-41d4-a716-446655440002",
+  "correlationId": "550e8400-e29b-41d4-a716-446655440000",
+  "tenantId": "tenant-01",
+  "siteId": "site-factory-a",
+  "gatewayId": "gw-edge-01",
+  "deviceId": "cam-zone-a-01",
+  "zoneId": "zone-a",
+  "observedAt": "2024-01-01T12:00:05.000Z",
+  "receivedAt": "2024-01-01T12:00:05.050Z",
+  "sequenceNo": 2,
+  "source": "zone-engine",
+  "quality": "GOOD",
+  "previousState": "VACANT_CONFIRMED",
+  "currentState": "OCCUPIED",
+  "transitionReason": "Person detected by camera",
+  "dwellSeconds": 0,
+  "confirmationCount": 0
+}

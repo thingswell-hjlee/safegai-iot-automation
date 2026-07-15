@@ -1,0 +1,43 @@
+{
+  "id": "FEAT-004",
+  "type": "feat",
+  "description": "Wave 0 - M01 Hybrid App Mock: Create React/TypeScript frontend scaffold with mock API, role-based routing (User/Operator/Maintainer), and basic status display. Branch: feat/m01-hybrid-app-mock",
+  "status": "pending",
+  "steps": [
+    "Create branch feat/m01-hybrid-app-mock from main",
+    "Create apps/frontend/package.json with React, TypeScript dependencies (note: no npm install possible, create structure only with source files)",
+    "Create apps/frontend/tsconfig.json",
+    "Create apps/frontend/src/index.tsx entry point",
+    "Create apps/frontend/src/App.tsx with role-based routing",
+    "Create apps/frontend/src/types/api.ts with TypeScript interfaces matching contracts (EventEnvelope, OccupancyState, EquipmentState, SafetyDecision)",
+    "Create apps/frontend/src/types/roles.ts with USER, OPERATOR, MAINTAINER role types",
+    "Create apps/frontend/src/mocks/mockApi.ts with mock data returning simulated zone states, events, equipment states",
+    "Create apps/frontend/src/components/StatusPanel.tsx showing zone occupancy states with safety colors",
+    "Create apps/frontend/src/components/EventList.tsx showing recent events",
+    "Create apps/frontend/src/components/EquipmentStatus.tsx showing equipment states",
+    "Create apps/frontend/src/pages/UserView.tsx with read-only status display",
+    "Create apps/frontend/src/pages/OperatorView.tsx with event ACK/resolve capability",
+    "Create apps/frontend/src/pages/MaintainerView.tsx with diagnostic display",
+    "Create apps/frontend/src/adapters/localAdapter.ts interface for Gateway API calls",
+    "Create apps/frontend/src/adapters/mockAdapter.ts implementing localAdapter with mock data",
+    "Ensure TypeScript types correctly reference OCCUPIED, VACANT_PENDING, VACANT_CONFIRMED, UNKNOWN, STALE states",
+    "Ensure UNKNOWN and STALE are never displayed as safe/vacant in components",
+    "Create apps/frontend/README.md documenting the mock app structure and how to run it",
+    "Commit all changes"
+  ],
+  "acceptance_criteria": [
+    "TypeScript source files compile without type errors (validated by manual review since no npm available)",
+    "Role types match docs/ROLE_MODE_SPEC.md permissions",
+    "Mock API returns data matching contracts/events/ schemas",
+    "UNKNOWN and STALE states are displayed with warning/danger styling, never as safe",
+    "User mode does not expose ACK, classify, I/O test, or settings",
+    "All JSON files pass make check-json"
+  ],
+  "verification": [
+    "python3 scripts/check-json.py succeeds",
+    "TypeScript files have no syntax errors (verified by manual AST review)",
+    "make verify-fast passes"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}
