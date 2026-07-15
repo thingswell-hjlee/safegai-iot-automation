@@ -7,14 +7,14 @@ import "fmt"
 type ErrorCode string
 
 const (
-	CodeValidation  ErrorCode = "VALIDATION_ERROR"
-	CodeNotFound    ErrorCode = "NOT_FOUND"
-	CodeConflict    ErrorCode = "CONFLICT"
-	CodeInternal    ErrorCode = "INTERNAL_ERROR"
-	CodeTimeout     ErrorCode = "TIMEOUT"
-	CodeIOFailure   ErrorCode = "IO_FAILURE"
-	CodeConnection  ErrorCode = "CONNECTION_ERROR"
-	CodeModbusError ErrorCode = "MODBUS_ERROR"
+	CodeValidation    ErrorCode = "VALIDATION_ERROR"
+	CodeNotFound      ErrorCode = "NOT_FOUND"
+	CodeConflict      ErrorCode = "CONFLICT"
+	CodeInternal      ErrorCode = "INTERNAL_ERROR"
+	CodeTimeout       ErrorCode = "TIMEOUT"
+	CodeIOFailure     ErrorCode = "IO_FAILURE"
+	CodeConnection    ErrorCode = "CONNECTION_ERROR"
+	CodeModbusError   ErrorCode = "MODBUS_ERROR"
 	CodeCapacityLimit ErrorCode = "CAPACITY_LIMIT"
 )
 
