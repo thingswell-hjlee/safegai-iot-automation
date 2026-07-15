@@ -53,6 +53,11 @@ type EquipmentState struct {
 	// State is the current equipment state derived from DI inputs.
 	State events.EquipmentState
 
+	// RestartRequested indicates an operator has requested a restart.
+	// This is NOT an equipment state per canonical contract; it is a
+	// separate operator request tracked as an audit event.
+	RestartRequested bool
+
 	// Quality indicates the reliability of the current state.
 	Quality ioAdapter.DIQuality
 
@@ -127,9 +132,10 @@ func (es *EquipmentState) Update(diStates []ioAdapter.DIState) {
 	es.LastUpdate = now
 	es.Quality = ioAdapter.DIQualityGood
 
+	// Track restart request separately (not an equipment state)
+	es.RestartRequested = restartActive
+
 	switch {
-	case restartActive:
-		es.State = events.EquipmentRestartRequested
 	case runDI.Value:
 		es.State = events.EquipmentRunning
 	default:

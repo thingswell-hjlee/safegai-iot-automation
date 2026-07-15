@@ -39,20 +39,28 @@ func (s OccupancyState) IsVacant() bool {
 }
 
 // EquipmentState represents the running state of equipment.
+// RESTART_REQUESTED is NOT an EquipmentState; it is an operator request
+// managed via a separate audit event.
 type EquipmentState string
 
 const (
-	EquipmentRunning          EquipmentState = "RUNNING"
-	EquipmentStopped          EquipmentState = "STOPPED"
-	EquipmentRestartRequested EquipmentState = "RESTART_REQUESTED"
-	EquipmentUnknown          EquipmentState = "UNKNOWN"
+	EquipmentRunning  EquipmentState = "RUNNING"
+	EquipmentStopped  EquipmentState = "STOPPED"
+	EquipmentStarting EquipmentState = "STARTING"
+	EquipmentStopping EquipmentState = "STOPPING"
+	EquipmentFault    EquipmentState = "FAULT"
+	EquipmentOffline  EquipmentState = "OFFLINE"
+	EquipmentUnknown  EquipmentState = "UNKNOWN"
 )
 
 // ValidEquipmentStates contains all valid EquipmentState values.
 var ValidEquipmentStates = []EquipmentState{
 	EquipmentRunning,
 	EquipmentStopped,
-	EquipmentRestartRequested,
+	EquipmentStarting,
+	EquipmentStopping,
+	EquipmentFault,
+	EquipmentOffline,
 	EquipmentUnknown,
 }
 

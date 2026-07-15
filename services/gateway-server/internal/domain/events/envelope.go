@@ -72,6 +72,9 @@ type EventEnvelope struct {
 
 	// Quality indicates data quality for the event payload.
 	Quality Quality `json:"quality"`
+
+	// Payload contains the domain-specific event data as serialized JSON.
+	Payload []byte `json:"payload,omitempty"`
 }
 
 // Validate checks that all required fields of the EventEnvelope are populated

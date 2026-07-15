@@ -85,7 +85,10 @@ func TestEquipmentState_AllStatesDefined(t *testing.T) {
 	expected := []EquipmentState{
 		EquipmentRunning,
 		EquipmentStopped,
-		EquipmentRestartRequested,
+		EquipmentStarting,
+		EquipmentStopping,
+		EquipmentFault,
+		EquipmentOffline,
 		EquipmentUnknown,
 	}
 
@@ -107,7 +110,10 @@ func TestEquipmentState_StringValues(t *testing.T) {
 	}{
 		{EquipmentRunning, "RUNNING"},
 		{EquipmentStopped, "STOPPED"},
-		{EquipmentRestartRequested, "RESTART_REQUESTED"},
+		{EquipmentStarting, "STARTING"},
+		{EquipmentStopping, "STOPPING"},
+		{EquipmentFault, "FAULT"},
+		{EquipmentOffline, "OFFLINE"},
 		{EquipmentUnknown, "UNKNOWN"},
 	}
 
@@ -117,6 +123,13 @@ func TestEquipmentState_StringValues(t *testing.T) {
 				t.Errorf("EquipmentState %q has string value %q, want %q", tt.state, string(tt.state), tt.value)
 			}
 		})
+	}
+}
+
+func TestEquipmentState_RestartRequestedNotAState(t *testing.T) {
+	invalid := EquipmentState("RESTART_REQUESTED")
+	if invalid.IsValid() {
+		t.Error("RESTART_REQUESTED must not be a valid EquipmentState")
 	}
 }
 

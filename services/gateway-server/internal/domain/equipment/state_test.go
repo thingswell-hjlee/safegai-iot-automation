@@ -60,12 +60,16 @@ func TestEquipmentState_Update_RestartRequested(t *testing.T) {
 
 	es.Update(diStates)
 
-	if es.GetState() != events.EquipmentRestartRequested {
-		t.Fatalf("expected RESTART_REQUESTED, got %s", es.GetState())
+	// Equipment is STOPPED (DI[0]=false), restart is a separate flag
+	if es.GetState() != events.EquipmentStopped {
+		t.Fatalf("expected STOPPED when run=false, got %s", es.GetState())
+	}
+	if !es.RestartRequested {
+		t.Fatalf("expected RestartRequested=true")
 	}
 }
 
-func TestEquipmentState_Update_RestartTakesPriority(t *testing.T) {
+func TestEquipmentState_Update_RestartWithRunning(t *testing.T) {
 	cfg := DefaultEquipmentConfig("eq-001")
 	es := NewEquipmentState(cfg)
 
@@ -75,8 +79,12 @@ func TestEquipmentState_Update_RestartTakesPriority(t *testing.T) {
 
 	es.Update(diStates)
 
-	if es.GetState() != events.EquipmentRestartRequested {
-		t.Fatalf("RESTART_REQUESTED should take priority over RUNNING, got %s", es.GetState())
+	// Equipment stays RUNNING, restart request is tracked separately
+	if es.GetState() != events.EquipmentRunning {
+		t.Fatalf("expected RUNNING when run DI is active, got %s", es.GetState())
+	}
+	if !es.RestartRequested {
+		t.Fatalf("expected RestartRequested=true")
 	}
 }
 
