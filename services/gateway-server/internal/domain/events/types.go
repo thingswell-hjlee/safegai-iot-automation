@@ -105,3 +105,44 @@ func (d SafetyDecision) IsValid() bool {
 	}
 	return false
 }
+
+// ActuationCommand represents allowed output commands.
+// STOP_REQUEST targets PLC or Safety Relay only.
+type ActuationCommand string
+
+const (
+	ActuationStopRequest       ActuationCommand = "STOP_REQUEST"
+	ActuationWarningLight      ActuationCommand = "WARNING_LIGHT"
+	ActuationWarningSiren      ActuationCommand = "WARNING_SIREN"
+	ActuationVoiceAnnounce     ActuationCommand = "VOICE_ANNOUNCE"
+	ActuationDigitalOutputTest ActuationCommand = "DIGITAL_OUTPUT_TEST"
+)
+
+// ValidActuationCommands contains all allowed actuation commands.
+var ValidActuationCommands = []ActuationCommand{
+	ActuationStopRequest,
+	ActuationWarningLight,
+	ActuationWarningSiren,
+	ActuationVoiceAnnounce,
+	ActuationDigitalOutputTest,
+}
+
+// IsValid returns true if the ActuationCommand is a recognized constant.
+func (c ActuationCommand) IsValid() bool {
+	for _, v := range ValidActuationCommands {
+		if c == v {
+			return true
+		}
+	}
+	return false
+}
+
+// Severity represents the severity level of a safety event.
+type Severity string
+
+const (
+	SeverityInfo     Severity = "INFO"
+	SeverityWarning  Severity = "WARNING"
+	SeverityCritical Severity = "CRITICAL"
+	SeverityAlarm    Severity = "ALARM"
+)
