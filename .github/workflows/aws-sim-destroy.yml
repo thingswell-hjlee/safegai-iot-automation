@@ -1,0 +1,58 @@
+name: AWS Sim Destroy
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type DESTROY to confirm destruction of all sim resources'
+        required: true
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: ap-northeast-2
+
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+    if: inputs.confirm == 'DESTROY'
+    environment: aws-sim-destroy
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: infra/sim/package-lock.json
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_SIM_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Install CDK dependencies
+        working-directory: infra/sim
+        run: npm ci
+
+      - name: CDK destroy
+        working-directory: infra/sim
+        run: |
+          echo "Destroying all SafeGAI simulation stacks..."
+          npx cdk destroy --all --force
+          echo "All simulation resources destroyed"
+
+      - name: Verify cleanup
+        run: |
+          echo "Verifying no orphaned resources..."
+          INSTANCES=$(aws ec2 describe-instances \
+            --filters "Name=tag:Project,Values=safegai-sim" \
+            --query 'Reservations[].Instances[].InstanceId' --output text)
+          if [ -n "$INSTANCES" ] && [ "$INSTANCES" != "None" ]; then
+            echo "WARNING: Orphaned instances found: $INSTANCES"
+          else
+            echo "No orphaned EC2 instances found"
+          fi

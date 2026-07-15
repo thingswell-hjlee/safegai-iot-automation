@@ -1,0 +1,87 @@
+name: AWS Sim CI
+
+on:
+  push:
+    branches: [feature/aws-first-edge-ready, main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  gateway-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache-dependency-path: services/gateway-server/go.sum
+
+      - name: Format check
+        working-directory: services/gateway-server
+        run: |
+          output=$(gofmt -l .)
+          if [ -n "$output" ]; then
+            echo "Files not formatted:"
+            echo "$output"
+            exit 1
+          fi
+
+      - name: Vet
+        working-directory: services/gateway-server
+        run: go vet ./...
+
+      - name: Test
+        working-directory: services/gateway-server
+        run: go test -race -coverprofile=coverage.out ./...
+
+      - name: Build gateway
+        working-directory: services/gateway-server
+        run: |
+          CGO_ENABLED=1 go build -o ../../dist/safegai-edge ./cmd/safegai-edge
+          go build -o ../../dist/safegai-camera-sim ./cmd/safegai-camera-sim
+          go build -o ../../dist/safegai-sensor-sim ./cmd/safegai-sensor-sim
+          go build -o ../../dist/safegai-equipment-sim ./cmd/safegai-equipment-sim
+          go build -o ../../dist/safegai-output-sim ./cmd/safegai-output-sim
+          go build -o ../../dist/safegai-modbus-sim ./cmd/safegai-modbus-sim
+          go build -o ../../dist/safegai-scenario-runner ./cmd/safegai-scenario-runner
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: gateway-binaries
+          path: dist/
+          retention-days: 7
+
+  cdk-synth:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: infra/sim/package-lock.json
+
+      - name: Install dependencies
+        working-directory: infra/sim
+        run: npm ci
+
+      - name: TypeScript check
+        working-directory: infra/sim
+        run: npx tsc --noEmit
+
+  contract-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check JSON schemas
+        run: python3 scripts/check-json.py
+
+      - name: Run contract tests
+        run: scripts/run-contract-tests.sh

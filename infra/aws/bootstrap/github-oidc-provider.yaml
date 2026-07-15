@@ -1,0 +1,28 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: |
+  GitHub OIDC Identity Provider for SafeGAI repository.
+  Deploy this once per AWS account. It allows GitHub Actions
+  to assume IAM roles without long-lived credentials.
+
+Resources:
+  GitHubOIDCProvider:
+    Type: AWS::IAM::OIDCProvider
+    Properties:
+      Url: https://token.actions.githubusercontent.com
+      ClientIdList:
+        - sts.amazonaws.com
+      ThumbprintList:
+        - 6938fd4d98bab03faadb97b34396831e3780aea1
+        - 1c58a3a8518e8759bf075b76b750d4f2df264fcd
+      Tags:
+        - Key: Project
+          Value: safegai
+        - Key: ManagedBy
+          Value: cloudformation
+
+Outputs:
+  OIDCProviderArn:
+    Description: ARN of the GitHub OIDC provider
+    Value: !GetAtt GitHubOIDCProvider.Arn
+    Export:
+      Name: safegai-github-oidc-provider-arn

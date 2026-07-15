@@ -1,0 +1,44 @@
+name: AWS Sim Start
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: ap-northeast-2
+
+jobs:
+  start:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_SIM_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Start EC2 instance
+        run: |
+          INSTANCE_ID=$(aws ec2 describe-instances \
+            --filters "Name=tag:Project,Values=safegai-sim" "Name=instance-state-name,Values=stopped" \
+            --query 'Reservations[0].Instances[0].InstanceId' --output text)
+
+          if [ "$INSTANCE_ID" != "None" ] && [ -n "$INSTANCE_ID" ]; then
+            echo "Starting instance: $INSTANCE_ID"
+            aws ec2 start-instances --instance-ids "$INSTANCE_ID"
+            echo "Waiting for instance to be running..."
+            aws ec2 wait instance-running --instance-ids "$INSTANCE_ID"
+            echo "Instance is running"
+
+            # Wait for gateway to be ready
+            echo "Waiting for services to initialize..."
+            sleep 30
+            echo "Instance started successfully"
+          else
+            echo "No stopped sim instance found"
+          fi

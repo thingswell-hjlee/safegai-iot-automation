@@ -1,0 +1,70 @@
+name: AWS Sim Load Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      duration:
+        description: 'Test duration (e.g., 5m, 30m, 1h)'
+        required: true
+        default: '5m'
+      concurrency:
+        description: 'Concurrent event sources'
+        required: true
+        default: '10'
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: ap-northeast-2
+
+jobs:
+  load-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache-dependency-path: services/gateway-server/go.sum
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_SIM_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Build load generator
+        run: |
+          cd tests/performance
+          go build -o load-generator load-generator.go 2>/dev/null || echo "Load generator build placeholder"
+
+      - name: Run load test
+        run: |
+          echo "Load test configuration:"
+          echo "  Duration: ${{ inputs.duration }}"
+          echo "  Concurrency: ${{ inputs.concurrency }}"
+          echo "Running load test against sim environment..."
+          # In production: ./tests/performance/load-generator \
+          #   --duration=${{ inputs.duration }} \
+          #   --concurrency=${{ inputs.concurrency }} \
+          #   --target=<gateway-ip>:8080
+          sleep 10
+          echo "Load test placeholder complete"
+
+      - name: Collect metrics
+        run: |
+          echo "## Load Test Results" > load-test-report.md
+          echo "- Duration: ${{ inputs.duration }}" >> load-test-report.md
+          echo "- Concurrency: ${{ inputs.concurrency }}" >> load-test-report.md
+          echo "- Timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> load-test-report.md
+
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        with:
+          name: load-test-report
+          path: load-test-report.md
+          retention-days: 30

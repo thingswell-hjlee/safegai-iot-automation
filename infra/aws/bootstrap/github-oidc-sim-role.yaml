@@ -1,0 +1,146 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: |
+  IAM Role for GitHub Actions to deploy SafeGAI simulation environment.
+  Assumes the OIDC provider is already created (see github-oidc-provider.yaml).
+
+Parameters:
+  GitHubOrg:
+    Type: String
+    Default: thingswell-hjlee
+    Description: GitHub organization or username
+  GitHubRepo:
+    Type: String
+    Default: safegai-iot-automation
+    Description: GitHub repository name
+  AllowedBranches:
+    Type: String
+    Default: 'ref:refs/heads/feature/aws-first-edge-ready,ref:refs/heads/main'
+    Description: Comma-separated list of allowed branch refs
+
+Resources:
+  SimDeployRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: safegai-sim-github-deploy-role
+      Description: Role for GitHub Actions to deploy sim environment
+      MaxSessionDuration: 3600
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !Sub 'arn:aws:iam::${AWS::AccountId}:oidc-provider/token.actions.githubusercontent.com'
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                'token.actions.githubusercontent.com:aud': sts.amazonaws.com
+              StringLike:
+                'token.actions.githubusercontent.com:sub': !Sub 'repo:${GitHubOrg}/${GitHubRepo}:*'
+      ManagedPolicyArns:
+        - !Ref SimDeployPolicy
+      Tags:
+        - Key: Project
+          Value: safegai-sim
+        - Key: ManagedBy
+          Value: cloudformation
+
+  SimDeployPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: safegai-sim-deploy-policy
+      Description: Permissions for deploying SafeGAI simulation environment
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: CDKBootstrap
+            Effect: Allow
+            Action:
+              - cloudformation:*
+              - ssm:GetParameter
+              - ssm:PutParameter
+            Resource: '*'
+          - Sid: EC2Management
+            Effect: Allow
+            Action:
+              - ec2:*
+            Resource: '*'
+            Condition:
+              StringEquals:
+                'aws:RequestedRegion': ap-northeast-2
+          - Sid: IAMPassRole
+            Effect: Allow
+            Action:
+              - iam:PassRole
+              - iam:CreateRole
+              - iam:DeleteRole
+              - iam:AttachRolePolicy
+              - iam:DetachRolePolicy
+              - iam:PutRolePolicy
+              - iam:DeleteRolePolicy
+              - iam:GetRole
+              - iam:GetRolePolicy
+              - iam:CreateInstanceProfile
+              - iam:DeleteInstanceProfile
+              - iam:AddRoleToInstanceProfile
+              - iam:RemoveRoleFromInstanceProfile
+            Resource:
+              - !Sub 'arn:aws:iam::${AWS::AccountId}:role/safegai-*'
+              - !Sub 'arn:aws:iam::${AWS::AccountId}:instance-profile/safegai-*'
+          - Sid: IoTCore
+            Effect: Allow
+            Action:
+              - iot:*
+            Resource: '*'
+          - Sid: DynamoDB
+            Effect: Allow
+            Action:
+              - dynamodb:*
+            Resource:
+              - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/safegai-*'
+          - Sid: S3
+            Effect: Allow
+            Action:
+              - s3:*
+            Resource:
+              - 'arn:aws:s3:::safegai-*'
+              - 'arn:aws:s3:::safegai-*/*'
+          - Sid: Lambda
+            Effect: Allow
+            Action:
+              - lambda:*
+            Resource:
+              - !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:SafeGAI-*'
+          - Sid: APIGateway
+            Effect: Allow
+            Action:
+              - apigateway:*
+            Resource: '*'
+          - Sid: CloudFront
+            Effect: Allow
+            Action:
+              - cloudfront:*
+            Resource: '*'
+          - Sid: Cognito
+            Effect: Allow
+            Action:
+              - cognito-idp:*
+            Resource:
+              - !Sub 'arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/*'
+          - Sid: CloudWatch
+            Effect: Allow
+            Action:
+              - cloudwatch:*
+              - logs:*
+              - events:*
+            Resource: '*'
+          - Sid: SSMRunCommand
+            Effect: Allow
+            Action:
+              - ssm:SendCommand
+              - ssm:GetCommandInvocation
+            Resource: '*'
+
+Outputs:
+  RoleArn:
+    Description: ARN of the deploy role (use as AWS_SIM_DEPLOY_ROLE_ARN secret)
+    Value: !GetAtt SimDeployRole.Arn
