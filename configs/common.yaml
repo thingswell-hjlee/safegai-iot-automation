@@ -1,0 +1,48 @@
+# SafeGAI Gateway - Common Configuration
+# This file is loaded first. Profile-specific files override these values.
+# The same binary uses different profiles for different environments.
+
+gateway:
+  id: "gw-default"
+  site_id: "site-default"
+  tenant_id: "tenant-default"
+  listen_addr: ":8080"
+  shutdown_timeout: "10s"
+  version: "0.1.0"
+
+storage:
+  type: "sqlite"
+  path: "/var/lib/safegai/data/safegai.db"
+  wal_mode: true
+  busy_timeout_ms: 5000
+  max_open_conns: 1
+
+safety:
+  # These values are FIXED and environment-independent
+  vacancy_confirm_duration: "3s"
+  vacancy_confirm_samples: 3
+  stale_timeout: "10s"
+  camera_offline_timeout: "30s"
+  dedup_window: "2s"
+  # FORBIDDEN: auto_restart is always false
+  auto_restart: false
+
+logging:
+  level: "info"
+  format: "json"
+  output: "stderr"
+
+health:
+  liveness_path: "/health/live"
+  readiness_path: "/health/ready"
+  watchdog_interval: "15s"
+
+audit:
+  enabled: true
+  retention_days: 90
+
+outbox:
+  max_queue_size: 1000
+  sync_interval: "5s"
+  base_backoff: "1s"
+  max_backoff: "60s"

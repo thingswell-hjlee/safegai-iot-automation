@@ -1,0 +1,20 @@
+# Production common configuration (included in .deb package)
+# See configs/ directory for all profile options.
+# This file is referenced by /etc/safegai/config.yaml symlink.
+gateway:
+  listen_addr: ":8080"
+  shutdown_timeout: "10s"
+  version: "0.1.0"
+
+storage:
+  type: "sqlite"
+  path: "/var/lib/safegai/data/safegai.db"
+  wal_mode: true
+
+safety:
+  auto_restart: false
+
+logging:
+  level: "info"
+  format: "json"
+  output: "stderr"

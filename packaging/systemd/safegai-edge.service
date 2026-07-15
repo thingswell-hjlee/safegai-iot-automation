@@ -1,0 +1,26 @@
+# SafeGAI Edge Gateway systemd unit
+# This is the canonical service file included in the .deb package.
+# Same unit runs on AWS EC2 and local Ubuntu IPC.
+[Unit]
+Description=SafeGAI Edge Gateway
+After=network-online.target mediamtx.service
+Wants=network-online.target
+
+[Service]
+Type=notify
+User=safegai
+Group=safegai
+ExecStart=/opt/safegai/current/bin/safegai-edge --config /etc/safegai/config.yaml
+Restart=always
+RestartSec=3
+WatchdogSec=30
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/safegai /var/log/safegai
+LimitNOFILE=65536
+Environment=SAFEGAI_DB_PATH=/var/lib/safegai/data/safegai.db
+
+[Install]
+WantedBy=multi-user.target

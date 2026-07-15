@@ -1,0 +1,69 @@
+# SafeGAI Gateway - AWS Simulation Profile
+# Camera, Sensor, Equipment, Output: all simulators
+# Cloud: AWS IoT enabled
+# Media: synthetic video via ffmpeg testsrc
+
+profile: "aws-sim"
+
+gateway:
+  id: "gw-sim-01"
+  site_id: "site-sim-01"
+  tenant_id: "tenant-thingswell"
+
+adapters:
+  camera:
+    type: "simulator"
+    cameras:
+      - id: "CAM-01"
+        zones: ["ZONE-01", "ZONE-02"]
+      - id: "CAM-02"
+        zones: ["ZONE-03", "ZONE-04"]
+      - id: "CAM-03"
+        zones: ["ZONE-05", "ZONE-06"]
+      - id: "CAM-04"
+        zones: ["ZONE-07", "ZONE-08"]
+
+  sensor:
+    type: "simulator"
+    sensors:
+      - id: "SENSOR-TEMP-01"
+        sensor_type: "temperature"
+      - id: "SENSOR-HUM-01"
+        sensor_type: "humidity"
+      - id: "SENSOR-CO2-01"
+        sensor_type: "co2"
+      - id: "SENSOR-GAS-01"
+        sensor_type: "gas"
+      - id: "SENSOR-VIB-01"
+        sensor_type: "vibration"
+      - id: "SENSOR-CUR-01"
+        sensor_type: "current"
+
+  equipment:
+    type: "simulator"
+    poll_interval: "1s"
+
+  output:
+    type: "simulator"
+    supported_commands:
+      - "WARNING_LIGHT"
+      - "WARNING_SIREN"
+      - "VOICE_ANNOUNCE"
+      - "STOP_REQUEST"
+      - "DIGITAL_OUTPUT_TEST"
+
+  media:
+    type: "simulator"
+    streams: 4
+
+  cloud:
+    type: "aws-iot"
+    endpoint: ""  # Set via environment variable SAFEGAI_IOT_ENDPOINT
+    thing_name: "safegai-gw-sim-01"
+    topic_prefix: "safegai/v1/tenant-thingswell/site-sim-01/gw-sim-01"
+
+  notification:
+    type: "log"
+
+storage:
+  path: "/var/lib/safegai/data/safegai.db"
