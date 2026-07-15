@@ -15,7 +15,7 @@
     },
     "commandType": {
       "type": "string",
-      "enum": ["STOP_REQUEST", "WARNING_LIGHT", "WARNING_SIREN", "VOICE_ANNOUNCE", "DIGITAL_OUTPUT"],
+      "enum": ["STOP_REQUEST", "WARNING_LIGHT", "WARNING_SIREN", "VOICE_ANNOUNCE", "DIGITAL_OUTPUT_TEST"],
       "description": "Type of actuation command"
     },
     "targetDevice": {

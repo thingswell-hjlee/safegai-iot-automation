@@ -70,13 +70,33 @@ def validate_type(value, expected_type: str, field_name: str, label: str) -> boo
     return True
 
 
+def resolve_ref(schema: dict, ref_path: str) -> dict:
+    """Resolve a simple $ref within the same schema (e.g. #/$defs/Foo)."""
+    if not ref_path.startswith("#/"):
+        return {}
+    parts = ref_path.lstrip("#/").split("/")
+    node = schema
+    for part in parts:
+        node = node.get(part, {})
+    return node
+
+
 def validate_instance(instance: dict, schema: dict, label: str) -> bool:
     """Validate an instance against a schema (basic structural validation)."""
     ok = True
 
-    # Check required fields
+    # Check required fields from schema itself
     if not validate_required_fields(instance, schema, label):
         ok = False
+
+    # Also check required fields from allOf references (envelope)
+    for ref_item in schema.get("allOf", []):
+        if "$ref" in ref_item and "envelope" in ref_item["$ref"]:
+            envelope_path = CONTRACTS_DIR / "events" / "event-envelope-v1.schema.json"
+            if envelope_path.exists():
+                envelope_schema = load_json(envelope_path)
+                if not validate_required_fields(instance, envelope_schema, f"{label}[envelope]"):
+                    ok = False
 
     # Check property types and enums
     properties = schema.get("properties", {})
@@ -84,6 +104,13 @@ def validate_instance(instance: dict, schema: dict, label: str) -> bool:
         if field_name not in instance:
             continue
         value = instance[field_name]
+
+        # Resolve $ref if present
+        if "$ref" in field_schema:
+            ref_resolved = resolve_ref(schema, field_schema["$ref"])
+            if ref_resolved:
+                field_schema = ref_resolved
+
         field_type = field_schema.get("type")
         if field_type and not validate_type(value, field_type, field_name, label):
             ok = False
@@ -145,36 +172,107 @@ def test_occupancy_vacancy_rule() -> None:
     schema = load_json(schema_path)
     label = "vacancy-rule"
 
-    states = schema.get("properties", {}).get("state", {}).get("enum", [])
+    # The canonical schema uses $defs for OccupancyState
+    occupancy_def = schema.get("$defs", {}).get("OccupancyState", {})
+    states = occupancy_def.get("enum", [])
+
+    if not states:
+        # Fallback: check properties.currentState or properties.state
+        states = schema.get("properties", {}).get("currentState", {}).get("enum", [])
+
     vacancy_states = [s for s in states if "VACANT" in s]
 
-    # VACANT_CONFIRMED must be present
-    if "VACANT_CONFIRMED" not in vacancy_states:
+    if "VACANT_CONFIRMED" not in states:
         log_fail(f"{label}: VACANT_CONFIRMED not in occupancy enum")
         return
 
     # VACANT_PENDING is a transitional state, not a confirmed vacancy
     # Only VACANT_CONFIRMED counts as actual vacancy
-    if "VACANT_CONFIRMED" in states:
-        log_pass(f"{label}: VACANT_CONFIRMED is the only confirmed vacancy state")
-    else:
-        log_fail(f"{label}: VACANT_CONFIRMED missing from enum")
+    log_pass(f"{label}: VACANT_CONFIRMED is the only confirmed vacancy state")
 
 
 def test_safety_decision_types() -> None:
-    """Verify safety decision schema has expected decision types."""
+    """Verify safety decision schema has canonical decision types."""
     schema_path = CONTRACTS_DIR / "events" / "safety-decision-v1.schema.json"
     schema = load_json(schema_path)
     label = "safety-decisions"
 
-    decisions = schema.get("properties", {}).get("decision", {}).get("enum", [])
-    expected = {"STOP_REQUEST_REQUIRED", "OPERATION_PERMITTED", "HOLD_CURRENT_STATE", "EMERGENCY_STOP"}
+    # The canonical schema uses $defs for SafetyDecision
+    decision_def = schema.get("$defs", {}).get("SafetyDecision", {})
+    decisions = decision_def.get("enum", [])
+
+    if not decisions:
+        decisions = schema.get("properties", {}).get("decision", {}).get("enum", [])
+
+    expected = {
+        "SAFE",
+        "WARNING",
+        "STOP_REQUEST_REQUIRED",
+        "RESTART_INTERLOCK",
+        "SAFETY_CONFIRMATION_UNAVAILABLE",
+        "MAINTENANCE_MONITORING",
+    }
+
+    # These values must NOT be present (banned by canonical contract)
+    banned = {"OPERATION_PERMITTED", "ALLOW_START", "EMERGENCY_STOP"}
+    found_banned = banned & set(decisions)
+
+    if found_banned:
+        log_fail(f"{label}: banned decision types found: {found_banned}")
+        return
 
     if set(decisions) == expected:
-        log_pass(f"{label}: all expected decision types present")
+        log_pass(f"{label}: all canonical decision types present, no banned values")
     else:
         missing = expected - set(decisions)
         extra = set(decisions) - expected
+        if missing:
+            log_fail(f"{label}: missing={missing}")
+        if extra:
+            log_fail(f"{label}: unexpected extra={extra}")
+        if not missing and not extra:
+            log_pass(f"{label}: all canonical decision types present")
+
+
+def test_equipment_state_types() -> None:
+    """Verify equipment state schema has canonical state types."""
+    schema_path = CONTRACTS_DIR / "events" / "equipment-state-v1.schema.json"
+    schema = load_json(schema_path)
+    label = "equipment-states"
+
+    # The canonical schema uses $defs for EquipmentState
+    state_def = schema.get("$defs", {}).get("EquipmentState", {})
+    states = state_def.get("enum", [])
+
+    expected = {"RUNNING", "STOPPED", "STARTING", "STOPPING", "FAULT", "OFFLINE", "UNKNOWN"}
+
+    # RESTART_REQUESTED must NOT be an equipment state
+    if "RESTART_REQUESTED" in states:
+        log_fail(f"{label}: RESTART_REQUESTED must not be an EquipmentState")
+        return
+
+    if set(states) == expected:
+        log_pass(f"{label}: all canonical equipment states present")
+    else:
+        missing = expected - set(states)
+        extra = set(states) - expected
+        log_fail(f"{label}: missing={missing}, extra={extra}")
+
+
+def test_actuation_command_types() -> None:
+    """Verify actuation result schema has only allowed command types."""
+    schema_path = CONTRACTS_DIR / "events" / "actuation-result-v1.schema.json"
+    schema = load_json(schema_path)
+    label = "actuation-commands"
+
+    command_enum = schema.get("properties", {}).get("commandType", {}).get("enum", [])
+    expected = {"STOP_REQUEST", "WARNING_LIGHT", "WARNING_SIREN", "VOICE_ANNOUNCE", "DIGITAL_OUTPUT_TEST"}
+
+    if set(command_enum) == expected:
+        log_pass(f"{label}: all canonical actuation commands present")
+    else:
+        missing = expected - set(command_enum)
+        extra = set(command_enum) - expected
         log_fail(f"{label}: missing={missing}, extra={extra}")
 
 
@@ -188,6 +286,8 @@ def main() -> int:
     test_invalid_missing_fields()
     test_occupancy_vacancy_rule()
     test_safety_decision_types()
+    test_equipment_state_types()
+    test_actuation_command_types()
 
     print("")
     print(f"  Results: {PASS} passed, {FAIL} failed")

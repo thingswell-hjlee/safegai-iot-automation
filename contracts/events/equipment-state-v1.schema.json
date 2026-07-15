@@ -34,8 +34,8 @@
   "$defs": {
     "EquipmentState": {
       "type": "string",
-      "enum": ["RUNNING", "STOPPED", "RESTART_REQUESTED", "UNKNOWN"],
-      "description": "Equipment operational states"
+      "enum": ["RUNNING", "STOPPED", "STARTING", "STOPPING", "FAULT", "OFFLINE", "UNKNOWN"],
+      "description": "Equipment operational states. RESTART_REQUESTED is not an equipment state; it is an operator request managed separately."
     }
   }
 }

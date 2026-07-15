@@ -1,11 +1,18 @@
 {
-  "camera_id": "cam-zone-a-01",
-  "zone_id": "zone-a",
-  "event_type": "PERSON_DETECTED",
-  "confidence": 0.95,
-  "bounding_boxes": [
-    { "x": 120.5, "y": 80.0, "width": 60.0, "height": 180.0 }
-  ],
-  "frame_id": "frame-20240101-120000-001",
-  "timestamp": "2024-01-01T12:00:00.000Z"
+  "schemaVersion": "1.0.0",
+  "eventId": "550e8400-e29b-41d4-a716-446655440001",
+  "correlationId": "550e8400-e29b-41d4-a716-446655440000",
+  "tenantId": "tenant-01",
+  "siteId": "site-factory-a",
+  "gatewayId": "gw-edge-01",
+  "deviceId": "cam-zone-a-01",
+  "zoneId": "zone-a",
+  "observedAt": "2024-01-01T12:00:00.000Z",
+  "receivedAt": "2024-01-01T12:00:00.050Z",
+  "sequenceNo": 1,
+  "source": "camera-adapter",
+  "quality": "GOOD",
+  "eventType": "PERSON_ENTER",
+  "occupancyCount": 1,
+  "confidence": 0.95
 }

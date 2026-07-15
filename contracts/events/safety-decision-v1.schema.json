@@ -24,7 +24,7 @@
     },
     "equipmentState": {
       "type": "string",
-      "enum": ["RUNNING", "STOPPED", "RESTART_REQUESTED", "UNKNOWN"],
+      "enum": ["RUNNING", "STOPPED", "STARTING", "STOPPING", "FAULT", "OFFLINE", "UNKNOWN"],
       "description": "Equipment state input to the decision"
     },
     "reason": {
