@@ -9,16 +9,50 @@ on:
 permissions:
   contents: read
 
+env:
+  GOTOOLCHAIN: local
+
 jobs:
   gateway-build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-go@v5
+      - name: Set up Go
+        uses: actions/setup-go@v6
         with:
-          go-version: '1.22'
-          cache-dependency-path: services/gateway-server/go.sum
+          go-version-file: services/gateway-server/go.mod
+          check-latest: true
+          cache: false
+
+      - name: Verify Go toolchain
+        working-directory: services/gateway-server
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          echo "Go executable:"
+          which go
+
+          echo "Go version:"
+          go version
+
+          echo "GOROOT:"
+          go env GOROOT
+
+          echo "GOTOOLDIR:"
+          go env GOTOOLDIR
+
+          echo "GOTOOLCHAIN:"
+          go env GOTOOLCHAIN
+
+          echo "Go tools:"
+          ls -la "$(go env GOTOOLDIR)"
+
+          echo "Checking covdata:"
+          go tool covdata -h >/dev/null
+
+          go version | grep -E 'go1\.25(\.|\ )'
 
       - name: Format check
         working-directory: services/gateway-server
@@ -34,20 +68,53 @@ jobs:
         working-directory: services/gateway-server
         run: go vet ./...
 
-      - name: Test
+      - name: Race tests
         working-directory: services/gateway-server
-        run: go test -race -coverprofile=coverage.out ./...
+        run: go test -race ./...
 
-      - name: Build gateway
+      - name: Coverage tests
         working-directory: services/gateway-server
+        run: go test -covermode=atomic -coverprofile=coverage.out ./...
+
+      - name: Coverage summary
+        working-directory: services/gateway-server
+        run: go tool cover -func=coverage.out
+
+      - name: Build gateway and simulators
+        working-directory: services/gateway-server
+        shell: bash
         run: |
-          CGO_ENABLED=1 go build -o ../../dist/safegai-edge ./cmd/safegai-edge
-          go build -o ../../dist/safegai-camera-sim ./cmd/safegai-camera-sim
-          go build -o ../../dist/safegai-sensor-sim ./cmd/safegai-sensor-sim
-          go build -o ../../dist/safegai-equipment-sim ./cmd/safegai-equipment-sim
-          go build -o ../../dist/safegai-output-sim ./cmd/safegai-output-sim
-          go build -o ../../dist/safegai-modbus-sim ./cmd/safegai-modbus-sim
-          go build -o ../../dist/safegai-scenario-runner ./cmd/safegai-scenario-runner
+          set -euo pipefail
+
+          mkdir -p ../../dist
+
+          CGO_ENABLED=1 go build \
+            -o ../../dist/safegai-edge \
+            ./cmd/safegai-edge
+
+          go build \
+            -o ../../dist/safegai-camera-sim \
+            ./cmd/safegai-camera-sim
+
+          go build \
+            -o ../../dist/safegai-sensor-sim \
+            ./cmd/safegai-sensor-sim
+
+          go build \
+            -o ../../dist/safegai-equipment-sim \
+            ./cmd/safegai-equipment-sim
+
+          go build \
+            -o ../../dist/safegai-output-sim \
+            ./cmd/safegai-output-sim
+
+          go build \
+            -o ../../dist/safegai-modbus-sim \
+            ./cmd/safegai-modbus-sim
+
+          go build \
+            -o ../../dist/safegai-scenario-runner \
+            ./cmd/safegai-scenario-runner
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4

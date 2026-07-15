@@ -25,6 +25,7 @@ permissions:
 
 env:
   AWS_REGION: ap-northeast-2
+  GOTOOLCHAIN: local
 
 jobs:
   deploy:
@@ -39,10 +40,12 @@ jobs:
           cache: npm
           cache-dependency-path: infra/sim/package-lock.json
 
-      - uses: actions/setup-go@v5
+      - name: Set up Go
+        uses: actions/setup-go@v6
         with:
-          go-version: '1.22'
-          cache-dependency-path: services/gateway-server/go.sum
+          go-version-file: services/gateway-server/go.mod
+          check-latest: true
+          cache: false
 
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
