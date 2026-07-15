@@ -1,0 +1,57 @@
+# SafeGAI Gateway - Local Pilot Profile
+# All adapters are real hardware.
+# Cloud adapter (AWS IoT) is enabled.
+# SAFETY: auto_restart is ALWAYS false. Human approval required.
+
+profile: "local-pilot"
+
+gateway:
+  id: ""  # Must be set per-site
+  site_id: ""  # Must be set per-site
+  tenant_id: "tenant-thingswell"
+
+adapters:
+  camera:
+    type: "vendor"
+    cameras: []  # Configured per-site
+
+  sensor:
+    type: "modbus"
+    sensors: []  # Configured per-site
+
+  equipment:
+    type: "modbus"
+    poll_interval: "200ms"
+    host: ""  # Set per-site
+
+  output:
+    type: "modbus-tcp"
+    host: ""  # Set per-site: PLC or Safety Relay address
+    # SAFETY: Output goes to PLC or Safety Relay only
+    # SAFETY: No automatic restart without human approval
+    supported_commands:
+      - "WARNING_LIGHT"
+      - "WARNING_SIREN"
+      - "VOICE_ANNOUNCE"
+      - "STOP_REQUEST"
+
+  media:
+    type: "mediamtx"
+    config_path: "/etc/safegai/mediamtx.yml"
+
+  cloud:
+    type: "aws-iot"
+    endpoint: ""  # Set via environment variable SAFEGAI_IOT_ENDPOINT
+    thing_name: ""  # Set per-site
+    topic_prefix: ""  # Set per-site
+
+  notification:
+    type: "sns"
+    topic_arn: ""  # Set via environment variable
+
+safety:
+  # These values are FIXED regardless of profile
+  auto_restart: false
+
+storage:
+  path: "/var/lib/safegai/data/safegai.db"

@@ -1,0 +1,61 @@
+# SafeGAI Gateway - Local Lab Profile
+# Mixed adapters: some real cameras, some simulators.
+# Cloud adapter is optionally enabled.
+# Used for lab testing with partial real hardware.
+
+profile: "local-lab"
+
+gateway:
+  id: "gw-lab-01"
+  site_id: "site-lab"
+  tenant_id: "tenant-thingswell"
+
+adapters:
+  camera:
+    type: "mixed"
+    cameras:
+      - id: "CAM-01"
+        zones: ["ZONE-01", "ZONE-02"]
+        adapter: "generic-http"
+        url: ""  # Set via environment variable
+      - id: "CAM-02"
+        zones: ["ZONE-03", "ZONE-04"]
+        adapter: "simulator"
+      - id: "CAM-03"
+        zones: ["ZONE-05", "ZONE-06"]
+        adapter: "simulator"
+      - id: "CAM-04"
+        zones: ["ZONE-07", "ZONE-08"]
+        adapter: "simulator"
+
+  sensor:
+    type: "simulator"
+    sensors:
+      - id: "SENSOR-TEMP-01"
+        sensor_type: "temperature"
+
+  equipment:
+    type: "modbus"
+    poll_interval: "500ms"
+    host: ""  # Set via environment variable
+
+  output:
+    type: "simulator"
+    supported_commands:
+      - "WARNING_LIGHT"
+      - "WARNING_SIREN"
+      - "STOP_REQUEST"
+      - "DIGITAL_OUTPUT_TEST"
+
+  media:
+    type: "mediamtx"
+    config_path: "/etc/safegai/mediamtx.yml"
+
+  cloud:
+    type: "disabled"
+
+  notification:
+    type: "log"
+
+storage:
+  path: "/var/lib/safegai/data/safegai.db"

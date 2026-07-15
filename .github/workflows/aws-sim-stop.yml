@@ -1,0 +1,39 @@
+name: AWS Sim Stop
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 22 * * *' # Daily 10PM UTC (cost saving)
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: ap-northeast-2
+
+jobs:
+  stop:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_SIM_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Stop EC2 instance
+        run: |
+          INSTANCE_ID=$(aws ec2 describe-instances \
+            --filters "Name=tag:Project,Values=safegai-sim" "Name=instance-state-name,Values=running" \
+            --query 'Reservations[0].Instances[0].InstanceId' --output text)
+
+          if [ "$INSTANCE_ID" != "None" ] && [ -n "$INSTANCE_ID" ]; then
+            echo "Stopping instance: $INSTANCE_ID"
+            aws ec2 stop-instances --instance-ids "$INSTANCE_ID"
+            echo "Instance stop initiated"
+          else
+            echo "No running sim instance found"
+          fi

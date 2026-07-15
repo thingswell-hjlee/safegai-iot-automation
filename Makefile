@@ -1,7 +1,10 @@
 SHELL := /usr/bin/env bash
 .DEFAULT_GOAL := help
 
-.PHONY: help setup check-prereqs format lint typecheck test test-contract test-integration security build package-amd64 verify-fast verify check-json check-shell
+VERSION ?= 0.1.0
+ARCH ?= amd64
+
+.PHONY: help setup check-prereqs format lint typecheck test test-contract test-integration security build package-amd64 verify-fast verify check-json check-shell manifest
 
 help:
 	@printf '%s\n' \
@@ -13,6 +16,8 @@ help:
 	  '  make test            Run unit tests when components exist' \
 	  '  make test-contract   Validate contract files' \
 	  '  make build           Build components when components exist' \
+	  '  make package-amd64   Build Debian package' \
+	  '  make manifest        Generate release manifest' \
 	  '  make verify-fast     Fast local verification' \
 	  '  make verify          Full pre-PR verification'
 
@@ -72,12 +77,15 @@ security:
 build:
 	@if [ -f services/gateway-server/go.mod ]; then \
 	  mkdir -p dist; \
-	  (cd services/gateway-server && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ../../dist/safegai-edge ./cmd/safegai-edge); \
+	  (cd services/gateway-server && CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -o ../../dist/safegai-edge ./cmd/safegai-edge); \
 	fi
 	@if [ -f package.json ]; then npm run build --if-present; fi
 
 package-amd64: build
-	@if [ -x packaging/gateway/build-deb.sh ]; then packaging/gateway/build-deb.sh; else echo 'Package script not implemented yet'; fi
+	@VERSION=$(VERSION) packaging/gateway/build-deb.sh
+
+manifest: build
+	@VERSION=$(VERSION) scripts/generate-manifest.sh
 
 verify-fast: format check-json check-shell lint typecheck test test-contract security
 	@echo 'verify-fast passed'

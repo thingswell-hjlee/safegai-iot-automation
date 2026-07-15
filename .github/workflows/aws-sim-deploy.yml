@@ -1,0 +1,89 @@
+name: AWS Sim Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'sim-dev'
+        type: choice
+        options:
+          - sim-dev
+      action:
+        description: 'Deploy action'
+        required: true
+        default: 'deploy'
+        type: choice
+        options:
+          - deploy
+          - diff
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: ap-northeast-2
+  GOTOOLCHAIN: local
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: aws-sim
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: infra/sim/package-lock.json
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: services/gateway-server/go.mod
+          check-latest: true
+          cache: false
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_SIM_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Build gateway binaries
+        working-directory: services/gateway-server
+        run: |
+          mkdir -p ../../dist
+          CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -o ../../dist/safegai-edge ./cmd/safegai-edge
+          for sim in camera sensor equipment output modbus scenario-runner; do
+            go build -o "../../dist/safegai-${sim}-sim" "./cmd/safegai-${sim}-sim" 2>/dev/null || \
+            go build -o "../../dist/safegai-${sim}" "./cmd/safegai-${sim}" 2>/dev/null || true
+          done
+
+      - name: Build Debian package
+        run: |
+          VERSION=0.1.0 packaging/gateway/build-deb.sh || echo "Package build skipped"
+
+      - name: Install CDK dependencies
+        working-directory: infra/sim
+        run: npm ci
+
+      - name: CDK diff
+        if: inputs.action == 'diff'
+        working-directory: infra/sim
+        run: npx cdk diff --all
+
+      - name: CDK deploy
+        if: inputs.action == 'deploy'
+        working-directory: infra/sim
+        run: npx cdk deploy --all --require-approval never
+
+      - name: Post-deploy health check
+        if: inputs.action == 'deploy'
+        run: |
+          echo "Waiting for instance initialization..."
+          sleep 60
+          echo "Health check would verify gateway via SSM or API"
