@@ -1,0 +1,46 @@
+name: AWS Simulation Deploy
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy AWS Simulation
+    runs-on: ubuntu-latest
+
+    # 이 Job에서 사용할 GitHub Environment
+    environment: aws-sim-dev
+
+    env:
+      AWS_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID }}
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      SIM_KEEP_ALIVE_HOURS: ${{ vars.SIM_KEEP_ALIVE_HOURS }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Configure AWS credentials using OIDC
+        uses: aws-actions/configure-aws-credentials@v6.1.0
+        with:
+          role-to-assume: ${{ vars.AWS_SIM_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+          role-session-name: github-sim-${{ github.run_id }}
+
+          # 다른 AWS 계정으로 잘못 연결되는 것을 방지
+          allowed-account-ids: ${{ vars.AWS_ACCOUNT_ID }}
+
+      - name: Verify AWS connection
+        run: |
+          echo "Checking AWS connection..."
+          aws sts get-caller-identity
+          echo "AWS region: ${AWS_REGION}"
+          echo "Simulation keep-alive: ${SIM_KEEP_ALIVE_HOURS} hours"
+
+      - name: Deploy simulation environment
+        run: |
+          echo "AWS simulation deployment starts here"
