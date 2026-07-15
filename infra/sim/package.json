@@ -1,0 +1,25 @@
+{
+  "name": "@safegai/infra-sim",
+  "version": "0.1.0",
+  "description": "SafeGAI AWS Simulation Environment CDK Infrastructure",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "cdk": "cdk",
+    "synth": "cdk synth",
+    "deploy": "cdk deploy --all",
+    "destroy": "cdk destroy --all",
+    "diff": "cdk diff",
+    "lint": "eslint bin lib --ext .ts"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.150.0",
+    "constructs": "^10.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "aws-cdk": "^2.150.0",
+    "typescript": "~5.5.0"
+  }
+}
