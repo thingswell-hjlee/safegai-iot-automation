@@ -1,0 +1,28 @@
+[Unit]
+Description=SafeGAI Scenario Runner
+Documentation=https://github.com/thingswell-hjlee/safegai-iot-automation
+After=network.target safegai-edge.service safegai-camera-sim.service safegai-sensor-sim.service
+Wants=safegai-edge.service
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/safegai-scenario-runner
+Restart=on-failure
+RestartSec=5
+EnvironmentFile=-/etc/safegai/environment
+Environment=SCENARIO_RUNNER_ADDR=:9010
+Environment=GATEWAY_URL=http://localhost:8080
+
+# Security hardening
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+ReadWritePaths=/var/log/safegai
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=safegai-scenario-runner
+
+[Install]
+WantedBy=multi-user.target

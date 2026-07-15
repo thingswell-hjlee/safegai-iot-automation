@@ -1,0 +1,28 @@
+[Unit]
+Description=SafeGAI Sensor Simulator
+Documentation=https://github.com/thingswell-hjlee/safegai-iot-automation
+After=network.target safegai-edge.service
+Wants=safegai-edge.service
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/safegai-sensor-sim
+Restart=on-failure
+RestartSec=5
+EnvironmentFile=-/etc/safegai/environment
+Environment=SENSOR_SIM_ADDR=:9002
+Environment=SENSOR_SIM_INTERVAL=3s
+
+# Security hardening
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+ReadWritePaths=/var/log/safegai
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=safegai-sensor-sim
+
+[Install]
+WantedBy=multi-user.target
